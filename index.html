@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Monthly Report — Brand On</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+  :root {
+    --navy: #0D2B5E;
+    --blue: #1A4DA1;
+    --mid-blue: #3B72C8;
+    --light-blue: #C8DEFF;
+    --pale: #EDF3FF;
+    --white: #FFFFFF;
+    --ink: #0D1B2A;
+    --muted: #5A6B82;
+    --border: #D0DDEF;
+    --accent: #1560BD;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body, * {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+  }
+  p, li, td, th, span, div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  body {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    background: #F4F7FC;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* TOP BAR */
+  #topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 52px;
+    border-bottom: 2px solid var(--mid-blue);
+  }
+
+  #topbar .brand {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    color: var(--white);
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  #topbar .controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .lang-toggle button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    padding: 5px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .lang-toggle button.active {
+    background: var(--mid-blue);
+    color: var(--white);
+  }
+
+  .export-btn {
+    background: var(--mid-blue);
+    color: var(--white);
+    border: none;
+    padding: 6px 18px;
+    font-size: 12px;
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  .export-btn:hover { background: var(--blue); }
+
+  /* SLIDE NAVIGATION */
+  #slide-nav {
+    position: fixed;
+    top: 52px; left: 0; right: 0;
+    z-index: 99;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    padding: 0 40px;
+    height: 44px;
+    gap: 4px;
+  }
+
+  #slide-nav::-webkit-scrollbar { height: 3px; }
+  #slide-nav::-webkit-scrollbar-thumb { background: var(--light-blue); }
+
+  .nav-item {
+    background: none;
+    border: none;
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 11.5px;
+    color: var(--muted);
+    padding: 4px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 3px;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-item:hover { color: var(--blue); background: var(--pale); }
+  .nav-item.active { color: var(--blue); background: var(--pale); font-weight: 600; }
+
+  /* MAIN CONTENT */
+  #content {
+    margin-top: 96px;
+    padding: 48px 40px 80px;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* SLIDE */
+  .slide {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .slide.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SLIDE HEADER */
+  .slide-header {
+    margin-bottom: 36px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .slide-number {
+    font-size: 11px;
+    color: var(--mid-blue);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .slide-title {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 32px;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .slide-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* COVER SLIDE */
+  .cover-wrap {
+    background: var(--navy);
+    border-radius: 6px;
+    padding: 64px 56px;
+    color: var(--white);
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover-wrap::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(59,114,200,0.15);
+  }
+
+  .cover-wrap::after {
+    content: '';
+    position: absolute;
+    right: 60px; bottom: -80px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: rgba(59,114,200,0.10);
+  }
+
+  .cover-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light-blue);
+    font-weight: 600;
+  }
+
+  .cover-main-title {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 20px 0 12px;
+  }
+
+  .cover-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.75);
+    max-width: 580px;
+    line-height: 1.8;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .cover-meta-item label {
+    display: block;
+    font-size: 10px;
+    color: var(--light-blue);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cover-meta-item span {
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  /* STAT CARDS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 22px 20px;
+    position: relative;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--blue);
+    border-radius: 5px 5px 0 0;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 28px;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stat-delta {
+    font-size: 12px;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  .stat-delta.up { color: #1E7D44; }
+  .stat-delta.down { color: #C0392B; }
+  .stat-delta.neutral { color: var(--muted); }
+
+  /* SECTION DIVIDER */
+  .section-label {
+    font-size: 11px;
+    color: var(--mid-blue);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 28px;
+  }
+
+  /* TEXT BLOCKS */
+  .text-block {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--blue);
+    padding: 24px 28px;
+    border-radius: 0 5px 5px 0;
+    margin-bottom: 20px;
+  }
+
+  .text-block h3 {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 17px;
+    color: var(--navy);
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  .text-block p {
+    color: var(--ink);
+    font-size: 14.5px;
+    line-height: 1.85;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+  }
+
+  /* TWO COL */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* CHART CARD */
+  .chart-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .chart-card h3 {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 15px;
+    color: var(--navy);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .chart-card canvas {
+    max-height: 220px;
+  }
+
+  /* TABLE */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .data-table thead tr {
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .data-table th {
+    padding: 11px 14px;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink);
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--pale); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-red { background: #FDE8E8; color: #C0392B; }
+  .badge-green { background: #E2F5E9; color: #1E7D44; }
+  .badge-yellow { background: #FEF9E7; color: #B7770D; }
+  .badge-blue { background: #EBF2FF; color: var(--blue); }
+
+  /* ISSUE LIST */
+  .issue-list {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+
+  .issue-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .issue-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .issue-dot.high { background: #C0392B; }
+  .issue-dot.medium { background: #E67E22; }
+  .issue-dot.low { background: #1A9B5E; }
+
+  /* ACTION PLAN */
+  .action-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 26px 28px;
+    margin-bottom: 18px;
+  }
+
+  .action-card h3 {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 17px;
+    color: var(--navy);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .action-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .action-num {
+    width: 22px; height: 22px;
+    background: var(--blue);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* GOOGLE ADS SLIDE */
+  .ads-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .ads-kpi {
+    background: var(--pale);
+    border: 1px solid var(--light-blue);
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .ads-kpi .kpi-val {
+    font-family: 'Microsoft YaHei', '微软雅黑', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', Arial, sans-serif;
+    font-size: 30px;
+    color: var(--navy);
+    font-weight: 700;
+    display: block;
+  }
+
+  .ads-kpi .kpi-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* FOOTER */
+  .slide-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* LANG HIDDEN */
+  div[data-lang="en"] { display: none; }
+  body.lang-en div[data-lang="zh"] { display: none; }
+  body.lang-en div[data-lang="en"] { display: block; }
+  [data-lang="en"] { display: none; }
+  body.lang-en [data-lang="zh"] { display: none; }
+  body.lang-en [data-lang="en"] { display: block; }
+  body.lang-en span[data-lang="en"],
+  body.lang-en td[data-lang="en"],
+  body.lang-en th[data-lang="en"],
+  body.lang-en li[data-lang="en"],
+  body.lang-en .stat-label[data-lang="en"],
+  body.lang-en h3[data-lang="en"] { display: inline; }
+  body.lang-en span[data-lang="zh"],
+  body.lang-en td[data-lang="zh"],
+  body.lang-en th[data-lang="zh"],
+  body.lang-en li[data-lang="zh"],
+  body.lang-en .stat-label[data-lang="zh"],
+  body.lang-en h3[data-lang="zh"] { display: none; }
+
+  span[data-lang="zh"] { display: inline; }
+  span[data-lang="en"] { display: none; }
+
+
+  /* ── BULLET LIST (黑色实心小圆点) ── */
+  .bullet-list {
+    list-style: none;
+    margin: 0 0 16px 0;
+    padding: 0;
+  }
+  .bullet-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 9px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+  .bullet-list li::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #0D1B2A;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .bullet-list li strong { font-weight: normal; font-family: inherit; color: inherit; }
+
+  /* ── ACTION CARD PRIORITY ── */
+  .action-card.priority-high {
+    border-left: 5px solid #0D2B5E;
+    background: #EDF3FF;
+  }
+  .action-card.priority-high h3 { color: #0D2B5E; }
+  .action-card.priority-mid {
+    border-left: 5px solid #3B72C8;
+    background: #F4F7FC;
+  }
+  .action-card.priority-mid h3 { color: #1A4DA1; }
+  .action-card.priority-low {
+    border-left: 5px solid #A8C3F0;
+    background: var(--white);
+  }
+  .action-card.priority-low h3 { color: #5A6B82; }
+  .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 9px;
+    border-radius: 3px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  .priority-badge.p-high { background: #0D2B5E; color: #fff; }
+  .priority-badge.p-mid  { background: #3B72C8; color: #fff; }
+  .priority-badge.p-low  { background: #A8C3F0; color: #0D2B5E; }
+
+  /* ── NO RIGHT-CLICK / NO SELECT ── */
+  body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* ── RESPONSIVE MEDIA QUERIES ── */
+  @media (max-width: 1100px) {
+    #content { padding: 40px 24px 80px; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 900px) {
+    #topbar { padding: 0 20px; }
+    #slide-nav { padding: 0 20px; }
+    #content { padding: 32px 16px 60px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .cover-wrap { padding: 40px 32px; }
+    .cover-main-title { font-size: 36px; }
+    .cover-meta { flex-wrap: wrap; gap: 20px; }
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 8px 10px; }
+  }
+  @media (max-width: 768px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .ads-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .cover-main-title { font-size: 28px; }
+    .cover-meta { gap: 16px; }
+    .action-card { padding: 18px 16px; }
+    .slide-title { font-size: 24px; }
+  }
+  @media (max-width: 480px) {
+    #topbar .brand { font-size: 14px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .cover-main-title { font-size: 22px; }
+    .stat-value { font-size: 22px; }
+    .nav-item { font-size: 10px; padding: 4px 8px; }
+    #slide-nav { height: auto; padding: 6px 12px; flex-wrap: wrap; gap: 2px; }
+    .chart-card canvas { max-height: 160px; }
+  }
+  @media print {
+    #topbar, #slide-nav { display: none; }
+    #content { margin-top: 0; padding: 20px; }
+    .slide { display: block !important; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());
+</script>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="brand">BRAND ON — SEO REPORT</div>
+  <div class="controls">
+    <div class="lang-toggle">
+      <button id="btn-zh" class="active" onclick="setLang('zh')">中文</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="export-btn" onclick="exportPPT()" style="display:none;">
+      <span data-lang="zh">导出 PPT</span>
+      <span data-lang="en">Export PPT</span>
+    </button>
+  </div>
+</div>
+
+<!-- SLIDE NAV -->
+<div id="slide-nav">
+  <button class="nav-item active" onclick="goTo(0)">
+    <span data-lang="zh">封面</span><span data-lang="en">Cover</span>
+  </button>
+  <button class="nav-item" onclick="goTo(1)">
+    <span data-lang="zh">流量概览</span><span data-lang="en">Traffic</span>
+  </button>
+  <button class="nav-item" onclick="goTo(2)">
+    <span data-lang="zh">搜索表现</span><span data-lang="en">Search</span>
+  </button>
+  <button class="nav-item" onclick="goTo(3)">
+    <span data-lang="zh">着陆页分析</span><span data-lang="en">Landing Pages</span>
+  </button>
+  <button class="nav-item" onclick="goTo(4)">
+    <span data-lang="zh">访问与转化率</span><span data-lang="en">Visits &amp; CVR</span>
+  </button>
+  <button class="nav-item" onclick="goTo(5)">
+    <span data-lang="zh">行动计划</span><span data-lang="en">Action Plan</span>
+  </button>
+  <button class="nav-item" onclick="goTo(6)">
+    <span data-lang="zh">总结</span><span data-lang="en">Summary</span>
+  </button>
+</div>
+
+<div id="content">
+
+<!-- SLIDE 0: COVER -->
+<div class="slide active" id="slide-0">
+  <div class="cover-wrap">
+    <div>
+      <div class="cover-tag" style="visibility:hidden;">—</div>
+      <div class="cover-main-title">
+        <span data-lang="zh">Brand On 月度报告</span>
+        <span data-lang="en">Brand On Monthly Report</span>
+      </div>
+      <div class="cover-desc">
+        <span data-lang="zh">本报告基于 GA4、Google Search Console 及 Shopify 三端数据，覆盖 2026 年 4 月网站流量表现、搜索页面浏览行为、着陆页质量、访问转化漏斗分析，并提出次月 Google Ads 投放与内容优化行动方案。</span>
+        <span data-lang="en">This report draws on GA4, Google Search Console and Shopify data to cover April 2026 site traffic, search page-view behaviour, landing page performance, visit-to-purchase funnel analysis, and a concrete action plan for Google Ads and content optimisation in May 2026.</span>
+      </div>
+    </div>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <label><span data-lang="zh">品牌</span><span data-lang="en">Brand</span></label>
+        <span>Brand On</span>
+      </div>
+      <div class="cover-meta-item">
+        <label><span data-lang="zh">报告周期</span><span data-lang="en">Period</span></label>
+        <span>Apr 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <label><span data-lang="zh">市场</span><span data-lang="en">Market</span></label>
+        <span>IT / EU / US</span>
+      </div>
+      <div class="cover-meta-item">
+        <label><span data-lang="zh">平台</span><span data-lang="en">Platform</span></label>
+        <span>Shopify + Google</span>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 1 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 1: TRAFFIC OVERVIEW -->
+<div class="slide" id="slide-1">
+  <div class="slide-header">
+    <div class="slide-number">
+      <span data-lang="zh">第 2 页 / 共 7 页</span><span data-lang="en">Page 2 / 7</span>
+    </div>
+    <div class="slide-title">
+      <span data-lang="zh">流量总览</span><span data-lang="en">Traffic Overview</span>
+    </div>
+    <div class="slide-subtitle">
+      <span data-lang="zh">自然流量、会话数与用户行为核心指标 — 2026 年 4 月 1 日 – 5 月 1 日</span>
+      <span data-lang="en">Organic traffic, sessions and core user behaviour metrics — 1 Apr – 1 May 2026</span>
+    </div>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总会话数</span><span data-lang="en">Total Sessions</span></div>
+      <div class="stat-value">7,694</div>
+      <div class="stat-delta up">+2,814.4% vs 上期</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总浏览次数</span><span data-lang="en">Total Page Views</span></div>
+      <div class="stat-value">4.1万</div>
+      <div class="stat-delta up">+2,897.6% vs 上期</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">活跃用户平均互动时长</span><span data-lang="en">Avg. Engagement Time</span></div>
+      <div class="stat-value">1分22秒</div>
+      <div class="stat-delta up">+15.4% vs 上期</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">感兴趣的会话数</span><span data-lang="en">Engaged Sessions</span></div>
+      <div class="stat-value">5,755</div>
+      <div class="stat-delta neutral">感兴趣占比 74.8%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">每位活跃用户会话数</span><span data-lang="en">Sessions / Active User</span></div>
+      <div class="stat-value">1.3</div>
+      <div class="stat-delta up">+12.5% vs 上期</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">每次会话平均事件数</span><span data-lang="en">Events / Session</span></div>
+      <div class="stat-value">12.26</div>
+      <div class="stat-delta neutral">总事件数 94,323</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3><span data-lang="zh">各渠道会话数分布（4 月）</span><span data-lang="en">Sessions by Channel (Apr 2026)</span></h3>
+      <canvas id="chart-sessions"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3><span data-lang="zh">渠道感兴趣会话占比对比</span><span data-lang="en">Engaged Session Rate by Channel</span></h3>
+      <canvas id="chart-source"></canvas>
+    </div>
+  </div>
+
+  <div class="text-block">
+    <h3 data-lang="zh">结论分析</h3>
+    <h3 data-lang="en">Key Insight</h3>
+    <div data-lang="zh">
+<ul class="bullet-list">
+      <li>4 月 1 日 – 5 月 1 日期间，网站总会话数达 7,694，较上一时段大幅增长 +2,814.4%，浏览次数达 4.1 万（+2,897.6%），标志着网站进入实质性运营阶段。</li>
+      <li>流量结构方面，Cross-network（付费跨渠道）以 2,590 次会话居首（33.66%），直接访问排第二（29.53%），自然搜索第三（22.73%），当前流量仍以付费与直接访问为主，SEO 自然流量仍有大幅成长空间。</li>
+      <li>感兴趣的会话比例 74.8%，用户互动质量良好；其中 Organic Social 感兴趣率最高（88.66%），Cross-network 次之（85.56%）。</li>
+      <li>每位活跃用户平均互动时长 1 分 22 秒，整体用户粘性处于合理水平，建议持续优化自然搜索内容，提升 Organic Search 在流量结构中的占比。</li>
+    </ul>
+</div>
+<div data-lang="en">
+<ul class="bullet-list">
+      <li>During 1 Apr – 1 May 2026, total sessions reached 7,694 (+2,814.4% vs. prior period) and page views reached 41,000 (+2,897.6%), marking the site's entry into meaningful operational traffic.</li>
+      <li>Channel mix: Cross-network (paid) leads at 33.66%, followed by Direct (29.53%) and Organic Search (22.73%). The traffic base remains largely paid and direct, with significant headroom for organic SEO growth.</li>
+      <li>Engaged session rate of 74.8% reflects strong content quality; Organic Social tops at 88.66%, Cross-network follows at 85.56%.</li>
+      <li>Average engagement time of 1 min 22 sec per active user is healthy. Priority: grow Organic Search share through sustained content and SEO investment.</li>
+    </ul>
+</div>
+  </div>
+
+  <div class="section-label" style="margin-top:24px;"><span data-lang="zh">渠道明细（GA4 — 2026 年 4 月）</span><span data-lang="en">Channel Breakdown (GA4 — Apr 2026)</span></div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th><span data-lang="zh">渠道</span><span data-lang="en">Channel</span></th>
+        <th><span data-lang="zh">会话数</span><span data-lang="en">Sessions</span></th>
+        <th><span data-lang="zh">感兴趣会话数</span><span data-lang="en">Engaged Sessions</span></th>
+        <th><span data-lang="zh">感兴趣占比</span><span data-lang="en">Engaged Rate</span></th>
+        <th><span data-lang="zh">每次会话互动时长</span><span data-lang="en">Avg. Engagement Time</span></th>
+        <th><span data-lang="zh">每次会话事件数</span><span data-lang="en">Events / Session</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Cross-network</td>
+        <td>2,590 <span style="color:var(--muted);font-size:12px;">(33.66%)</span></td>
+        <td>2,216 <span style="color:var(--muted);font-size:12px;">(38.51%)</span></td>
+        <td>85.56%</td>
+        <td>31 秒</td>
+        <td>7.67</td>
+      </tr>
+      <tr>
+        <td>Direct</td>
+        <td>2,272 <span style="color:var(--muted);font-size:12px;">(29.53%)</span></td>
+        <td>1,263 <span style="color:var(--muted);font-size:12px;">(21.95%)</span></td>
+        <td>55.59%</td>
+        <td>50 秒</td>
+        <td>10.45</td>
+      </tr>
+      <tr>
+        <td>Organic Search</td>
+        <td>1,749 <span style="color:var(--muted);font-size:12px;">(22.73%)</span></td>
+        <td>1,354 <span style="color:var(--muted);font-size:12px;">(23.53%)</span></td>
+        <td>77.42%</td>
+        <td>1 分 42 秒</td>
+        <td>17.23</td>
+      </tr>
+      <tr>
+        <td>Organic Social</td>
+        <td>882 <span style="color:var(--muted);font-size:12px;">(11.46%)</span></td>
+        <td>782 <span style="color:var(--muted);font-size:12px;">(13.59%)</span></td>
+        <td>88.66%</td>
+        <td>1 分 40 秒</td>
+        <td>19.25</td>
+      </tr>
+      <tr>
+        <td>Unassigned</td>
+        <td>168 <span style="color:var(--muted);font-size:12px;">(2.18%)</span></td>
+        <td>98 <span style="color:var(--muted);font-size:12px;">(1.70%)</span></td>
+        <td>58.33%</td>
+        <td>1 分 17 秒</td>
+        <td>13.01</td>
+      </tr>
+      <tr>
+        <td>Organic Shopping</td>
+        <td>52 <span style="color:var(--muted);font-size:12px;">(0.68%)</span></td>
+        <td>48 <span style="color:var(--muted);font-size:12px;">(0.83%)</span></td>
+        <td>92.31%</td>
+        <td>1 分 00 秒</td>
+        <td>12.50</td>
+      </tr>
+      <tr>
+        <td>Email</td>
+        <td>32 <span style="color:var(--muted);font-size:12px;">(0.42%)</span></td>
+        <td>27 <span style="color:var(--muted);font-size:12px;">(0.47%)</span></td>
+        <td>84.38%</td>
+        <td>1 分 16 秒</td>
+        <td>14.56</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 2 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 2: SEARCH PERFORMANCE -->
+<div class="slide" id="slide-2">
+  <div class="slide-header">
+    <div class="slide-number"><span data-lang="zh">第 3 页 / 共 7 页</span><span data-lang="en">Page 3 / 7</span></div>
+    <div class="slide-title"><span data-lang="zh">搜索表现 — 网页浏览与用户行为</span><span data-lang="en">Search Performance — Page Views &amp; User Behaviour</span></div>
+    <div class="slide-subtitle"><span data-lang="zh">GA4 网页和屏幕数据：浏览次数、活跃用户、互动时长及关键事件 — 2026 年 4 月</span><span data-lang="en">GA4 pages &amp; screens: page views, active users, engagement time and key events — April 2026</span></div>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总浏览次数</span><span data-lang="en">Total Page Views</span></div>
+      <div class="stat-value">41,007</div>
+      <div class="stat-delta neutral">占总数 100%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">活跃用户数</span><span data-lang="en">Active Users</span></div>
+      <div class="stat-value">5,880</div>
+      <div class="stat-delta neutral">人均浏览 6.97 页</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">活跃用户平均互动时长</span><span data-lang="en">Avg. Engagement / User</span></div>
+      <div class="stat-value">1分22秒</div>
+      <div class="stat-delta neutral">与均值相差 0%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总收益</span><span data-lang="en">Total Revenue</span></div>
+      <div class="stat-value">€3,719.50</div>
+      <div class="stat-delta neutral">共 1,369 个页面</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3><span data-lang="zh">TOP 8 页面浏览次数</span><span data-lang="en">TOP 8 Pages by Views</span></h3>
+      <canvas id="chart-ctr" style="max-height:220px"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3><span data-lang="zh">TOP 8 页面平均互动时长</span><span data-lang="en">TOP 8 Pages — Avg. Engagement Time</span></h3>
+      <canvas id="chart-search-time" style="max-height:220px"></canvas>
+    </div>
+  </div>
+
+  <div class="section-label"><span data-lang="zh">核心页面明细（GA4 — 2026 年 4 月，共 1,369 行）</span><span data-lang="en">Core Page Detail (GA4 — Apr 2026, 1,369 rows total)</span></div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th><span data-lang="zh">页面 / 屏幕名称</span><span data-lang="en">Page / Screen Name</span></th>
+        <th><span data-lang="zh">浏览次数</span><span data-lang="en">Views</span></th>
+        <th><span data-lang="zh">活跃用户</span><span data-lang="en">Active Users</span></th>
+        <th><span data-lang="zh">人均浏览量</span><span data-lang="en">Views / User</span></th>
+        <th><span data-lang="zh">平均互动时长</span><span data-lang="en">Avg. Engagement</span></th>
+        <th><span data-lang="zh">事件数</span><span data-lang="en">Events</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>—</td>
+        <td><span data-lang="zh">总计</span><span data-lang="en">Total</span></td>
+        <td>41,007</td>
+        <td>5,880</td>
+        <td>6.97</td>
+        <td>1分22秒</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>ALL Page – BRAND ON VINTAGE</td>
+        <td>6,670 <span style="color:var(--muted);font-size:11px;">(16.27%)</span></td>
+        <td>917 <span style="color:var(--muted);font-size:11px;">(15.6%)</span></td>
+        <td>7.27</td>
+        <td>1分38秒</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>BRAND ON VINTAGE</td>
+        <td>6,153 <span style="color:var(--muted);font-size:11px;">(15%)</span></td>
+        <td>3,644 <span style="color:var(--muted);font-size:11px;">(61.97%)</span></td>
+        <td>1.69</td>
+        <td>15秒</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td>ALL Page – Page 3 – BRAND ON VINTAGE</td>
+        <td>252 <span style="color:var(--muted);font-size:11px;">(0.61%)</span></td>
+        <td>56 <span style="color:var(--muted);font-size:11px;">(0.95%)</span></td>
+        <td>4.50</td>
+        <td>37秒</td>
+        <td>348</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>Novità – BRAND ON VINTAGE</td>
+        <td>251 <span style="color:var(--muted);font-size:11px;">(0.61%)</span></td>
+        <td>66 <span style="color:var(--muted);font-size:11px;">(1.12%)</span></td>
+        <td>3.80</td>
+        <td>48秒</td>
+        <td>392</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>Prada – BRAND ON VINTAGE</td>
+        <td>221 <span style="color:var(--muted);font-size:11px;">(0.54%)</span></td>
+        <td>157 <span style="color:var(--muted);font-size:11px;">(2.67%)</span></td>
+        <td>1.41</td>
+        <td>17秒</td>
+        <td>447</td>
+      </tr>
+      <tr>
+        <td>21</td>
+        <td>Balenciaga – BRAND ON VINTAGE</td>
+        <td>220 <span style="color:var(--muted);font-size:11px;">(0.54%)</span></td>
+        <td>185 <span style="color:var(--muted);font-size:11px;">(3.15%)</span></td>
+        <td>1.19</td>
+        <td>9秒</td>
+        <td>449</td>
+      </tr>
+      <tr>
+        <td>22</td>
+        <td>Jacquemus Le Grand Bambino nero con logo oro – BOV</td>
+        <td>216 <span style="color:var(--muted);font-size:11px;">(0.53%)</span></td>
+        <td>114 <span style="color:var(--muted);font-size:11px;">(1.94%)</span></td>
+        <td>1.89</td>
+        <td>28秒</td>
+        <td>790 <span style="color:#1E7D44;font-size:11px;font-weight:600;">(2.4%)</span></td>
+      </tr>
+      <tr>
+        <td>24</td>
+        <td>Prodotti – BRAND ON VINTAGE</td>
+        <td>205 <span style="color:var(--muted);font-size:11px;">(0.5%)</span></td>
+        <td>42 <span style="color:var(--muted);font-size:11px;">(0.71%)</span></td>
+        <td>4.88</td>
+        <td>1分15秒</td>
+        <td>315</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-block">
+    <h3 data-lang="zh">结论分析</h3>
+    <h3 data-lang="en">Key Insight</h3>
+    <div data-lang="zh">
+<ul class="bullet-list">
+      <li>4 月全站共产生 41,007 次浏览，活跃用户 5,880 人，人均浏览 6.97 页，平均互动时长 1 分 22 秒，整体浏览深度良好。</li>
+      <li>「ALL Page – BRAND ON VINTAGE」（6,670 次，16.27%）人均浏览量高达 7.27 页，用户商品探索意愿强；而「BRAND ON VINTAGE」主页（6,153 次）活跃用户最多，但人均仅 1.69 页、停留 15 秒，首页内容钩子与导流设计存在明显优化空间。</li>
+      <li>Jacquemus 产品页事件数占比 2.4%，是当月事件触发率最高的单一产品页，存在真实搜索需求，建议优先补充多角度图片与详细描述以提升转化。</li>
+      <li>Prada 与 Balenciaga 品类页互动时长偏短（9–17 秒），高价值品牌词落地页内容吸引力不足，需系统性优化页面丰富度。</li>
+    </ul>
+</div>
+<div data-lang="en">
+<ul class="bullet-list">
+      <li>April recorded 41,007 page views across 5,880 active users, averaging 6.97 pages/user and 1 min 22 sec engagement — healthy browsing depth overall.</li>
+      <li>"ALL Page – BRAND ON VINTAGE" (6,670 views, 16.27%) shows strong product-exploration intent at 7.27 pages/user; the homepage (6,153 views) reaches the most users but with only 1.69 pages/user and 15-second dwell time, indicating weak hooks and navigation.</li>
+      <li>The Jacquemus product page holds the highest key-event rate (2.4%) among all single product pages — adding multi-angle photos and detailed copy is a priority to convert this demand.</li>
+      <li>Prada and Balenciaga category pages show very short engagement (9–17 sec), indicating insufficient landing page content for these high-value brand terms.</li>
+    </ul>
+</div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 3 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 3: LANDING PAGE ANALYSIS -->
+<div class="slide" id="slide-3">
+  <div class="slide-header">
+    <div class="slide-number"><span data-lang="zh">第 4 页 / 共 7 页</span><span data-lang="en">Page 4 / 7</span></div>
+    <div class="slide-title"><span data-lang="zh">着陆页分析</span><span data-lang="en">Landing Page Analysis</span></div>
+    <div class="slide-subtitle"><span data-lang="zh">GA4 着陆页会话数、活跃用户、新用户及关键事件数据 — 2026 年 4 月</span><span data-lang="en">GA4 landing page sessions, active users, new users and key events — April 2026</span></div>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总会话数</span><span data-lang="en">Total Sessions</span></div>
+      <div class="stat-value">7,694</div>
+      <div class="stat-delta neutral">10 个着陆页</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">活跃用户数</span><span data-lang="en">Active Users</span></div>
+      <div class="stat-value">5,880</div>
+      <div class="stat-delta neutral">占总数 100%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">新用户数</span><span data-lang="en">New Users</span></div>
+      <div class="stat-value">5,871</div>
+      <div class="stat-delta neutral">新用户占比 99.8%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">关键事件数（总）</span><span data-lang="en">Key Events (Total)</span></div>
+      <div class="stat-value">9,965</div>
+      <div class="stat-delta neutral">总收益 EUR 3,719.50</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3><span data-lang="zh">TOP 7 着陆页会话数对比</span><span data-lang="en">TOP 7 Landing Pages by Sessions</span></h3>
+      <canvas id="chart-lp-sessions" style="max-height:220px"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3><span data-lang="zh">各着陆页平均互动时长</span><span data-lang="en">Avg. Engagement Time by Landing Page</span></h3>
+      <canvas id="chart-lp-time" style="max-height:220px"></canvas>
+    </div>
+  </div>
+
+  <div class="section-label"><span data-lang="zh">着陆页明细（GA4 — 2026 年 4 月）</span><span data-lang="en">Landing Page Detail (GA4 — Apr 2026)</span></div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th><span data-lang="zh">着陆页</span><span data-lang="en">Landing Page</span></th>
+        <th><span data-lang="zh">会话数</span><span data-lang="en">Sessions</span></th>
+        <th><span data-lang="zh">活跃用户</span><span data-lang="en">Active Users</span></th>
+        <th><span data-lang="zh">新用户数</span><span data-lang="en">New Users</span></th>
+        <th><span data-lang="zh">平均互动时长</span><span data-lang="en">Avg. Engagement</span></th>
+        <th><span data-lang="zh">关键事件数</span><span data-lang="en">Key Events</span></th>
+        <th><span data-lang="zh">收益 (EUR)</span><span data-lang="en">Revenue (EUR)</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>/ <span style="color:var(--muted);font-size:11px;">(首页)</span></td>
+        <td>3,815 <span style="color:var(--muted);font-size:11px;">(49.58%)</span></td>
+        <td>3,183</td>
+        <td>3,117 <span style="color:var(--muted);font-size:11px;">(53.09%)</span></td>
+        <td>1分16秒</td>
+        <td>4,264 <span style="color:var(--muted);font-size:11px;">(42.79%)</span></td>
+        <td>€1,073.50 <span style="color:var(--muted);font-size:11px;">(28.86%)</span></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>/en-us</td>
+        <td>303 <span style="color:var(--muted);font-size:11px;">(3.94%)</span></td>
+        <td>277</td>
+        <td>271 <span style="color:var(--muted);font-size:11px;">(4.62%)</span></td>
+        <td>1分34秒</td>
+        <td>357</td>
+        <td>€361.00 <span style="color:var(--muted);font-size:11px;">(9.71%)</span></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>/collections/all-page</td>
+        <td>205 <span style="color:var(--muted);font-size:11px;">(2.66%)</span></td>
+        <td>148</td>
+        <td>101 <span style="color:var(--muted);font-size:11px;">(1.72%)</span></td>
+        <td>1分24秒</td>
+        <td>288</td>
+        <td>€0.00</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>(not set)</td>
+        <td>147 <span style="color:var(--muted);font-size:11px;">(1.91%)</span></td>
+        <td>107</td>
+        <td>3 <span style="color:var(--muted);font-size:11px;">(0.05%)</span></td>
+        <td>5秒</td>
+        <td>6</td>
+        <td>€0.00</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>/collections/louis-vuitton</td>
+        <td>125 <span style="color:var(--muted);font-size:11px;">(1.62%)</span></td>
+        <td>86</td>
+        <td>61 <span style="color:var(--muted);font-size:11px;">(1.04%)</span></td>
+        <td>1分34秒</td>
+        <td>201</td>
+        <td>€0.00</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>/en</td>
+        <td>110 <span style="color:var(--muted);font-size:11px;">(1.43%)</span></td>
+        <td>85</td>
+        <td>78 <span style="color:var(--muted);font-size:11px;">(1.33%)</span></td>
+        <td>2分46秒</td>
+        <td>211</td>
+        <td>€250.00 <span style="color:var(--muted);font-size:11px;">(6.72%)</span></td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>/collections</td>
+        <td>108 <span style="color:var(--muted);font-size:11px;">(1.40%)</span></td>
+        <td>96</td>
+        <td>66 <span style="color:var(--muted);font-size:11px;">(1.12%)</span></td>
+        <td>2分01秒</td>
+        <td>194</td>
+        <td>€0.00</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td style="font-size:12px;">/products/jacquemus-le-grand-bambino-nero-con-logo-oro</td>
+        <td>99 <span style="color:var(--muted);font-size:11px;">(1.29%)</span></td>
+        <td>74</td>
+        <td>64 <span style="color:var(--muted);font-size:11px;">(1.09%)</span></td>
+        <td>31秒</td>
+        <td>184</td>
+        <td>€0.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-block">
+    <h3 data-lang="zh">结论分析</h3>
+    <h3 data-lang="en">Key Insight</h3>
+    <div data-lang="zh">
+<ul class="bullet-list">
+      <li>首页（/）承接 49.58% 的会话流量，新用户占比 53.09%，品牌信任传递与引导点击能力直接决定后续转化效果；当月贡献收益 EUR 1,073.50（占 28.86%）。</li>
+      <li>/en-us 和 /en 页面贡献收益分别为 EUR 361（9.71%）和 EUR 250（6.72%），英语版页面用户购买意向显著较强。</li>
+      <li>/collections/louis-vuitton 及 /collections/all-page 等品类着陆页收益为零，但互动时长合理（约 1 分 30 秒），用户有浏览兴趣但未完成转化，建议优化 CTA 引导与信任元素。</li>
+      <li>产品详情页（Jacquemus 系列）互动时长仅 31 秒且收益为零，需排查页面内容丰富度与价格信息完整性。</li>
+    </ul>
+</div>
+<div data-lang="en">
+<ul class="bullet-list">
+      <li>The homepage (/) captures 49.58% of all sessions and 53.09% of new users; its ability to convey brand trust is critical to conversion. It contributed EUR 1,073.50 (28.86%) in revenue.</li>
+      <li>/en-us (EUR 361, 9.71%) and /en (EUR 250, 6.72%) show that English-language pages attract users with stronger purchase intent.</li>
+      <li>/collections/louis-vuitton and /collections/all-page show zero revenue despite reasonable engagement (~1 min 30 sec) — users browse but don't convert. CTA and trust signal optimisation is recommended.</li>
+      <li>Product pages (Jacquemus) have only 31-second dwell times and zero revenue, pointing to gaps in content richness and pricing transparency.</li>
+    </ul>
+</div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 4 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 4: VISIT & CONVERSION RATE -->
+<div class="slide" id="slide-4">
+  <div class="slide-header">
+    <div class="slide-number"><span data-lang="zh">第 5 页 / 共 7 页</span><span data-lang="en">Page 5 / 7</span></div>
+    <div class="slide-title"><span data-lang="zh">访问与转化率分析</span><span data-lang="en">Visits &amp; Conversion Rate Analysis</span></div>
+    <div class="slide-subtitle"><span data-lang="zh">Shopify 转化漏斗：访问 → 加购 → 结账 → 完成结账 — 2026 年 4 月 vs 3 月</span><span data-lang="en">Shopify conversion funnel: Visits → ATC → Checkout → Completed Checkout — Apr 2026 vs Mar 2026</span></div>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(5,1fr);">
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">总访问量</span><span data-lang="en">Total Visits</span></div>
+      <div class="stat-value">9,347</div>
+      <div class="stat-delta up">+96% vs 3月</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">已加购 (ATC)</span><span data-lang="en">Add to Cart</span></div>
+      <div class="stat-value">201</div>
+      <div class="stat-delta up">+128% vs 3月</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">已到结账页 (IC)</span><span data-lang="en">Reached Checkout</span></div>
+      <div class="stat-value">116</div>
+      <div class="stat-delta up">+87% vs 3月</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">完成结账 (Purchase)</span><span data-lang="en">Completed Checkout</span></div>
+      <div class="stat-value">10</div>
+      <div class="stat-delta up">+233% vs 3月</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">整体转化率</span><span data-lang="en">Overall CVR</span></div>
+      <div class="stat-value">0.1%</div>
+      <div class="stat-delta up">+70% vs 3月</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <h3><span data-lang="zh">4月 vs 3月：各漏斗层级对比</span><span data-lang="en">Apr vs Mar: Funnel Stage Comparison</span></h3>
+      <canvas id="chart-cvr-compare" style="max-height:210px"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3><span data-lang="zh">漏斗各层转化率（4 月）</span><span data-lang="en">Stage-by-Stage Conversion Rate (Apr 2026)</span></h3>
+      <canvas id="chart-cvr-funnel" style="max-height:210px"></canvas>
+    </div>
+  </div>
+
+  <div class="section-label"><span data-lang="zh">月度汇总对比</span><span data-lang="en">Monthly Summary Comparison</span></div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th><span data-lang="zh">指标</span><span data-lang="en">Metric</span></th>
+        <th><span data-lang="zh">2026 年 4 月</span><span data-lang="en">Apr 2026</span></th>
+        <th><span data-lang="zh">2026 年 3 月</span><span data-lang="en">Mar 2026</span></th>
+        <th><span data-lang="zh">变化幅度</span><span data-lang="en">Change</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span data-lang="zh">访问量</span><span data-lang="en">Visits</span></td>
+        <td>9,347</td>
+        <td>4,763</td>
+        <td><span class="badge badge-green">+96%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">已添加购物车</span><span data-lang="en">Add to Cart</span></td>
+        <td>201</td>
+        <td>88</td>
+        <td><span class="badge badge-green">+128%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">已到达结账页</span><span data-lang="en">Reached Checkout</span></td>
+        <td>116</td>
+        <td>62</td>
+        <td><span class="badge badge-green">+87%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">完成结账（购买）</span><span data-lang="en">Completed Checkout</span></td>
+        <td>10</td>
+        <td>3</td>
+        <td><span class="badge badge-green">+233%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">整体转化率</span><span data-lang="en">Overall CVR</span></td>
+        <td>0.1%</td>
+        <td>0.06%</td>
+        <td><span class="badge badge-green">+70%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">ATC 转化率（ATC/访问）</span><span data-lang="en">ATC Rate (ATC/Visits)</span></td>
+        <td>2.15%</td>
+        <td>1.85%</td>
+        <td><span class="badge badge-green">+16%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">结账转化率（IC/ATC）</span><span data-lang="en">Checkout Rate (IC/ATC)</span></td>
+        <td>57.7%</td>
+        <td>70.5%</td>
+        <td><span class="badge badge-red">-18%</span></td>
+      </tr>
+      <tr>
+        <td><span data-lang="zh">完成结账率（Purchase/IC）</span><span data-lang="en">Purchase Rate (Purchase/IC)</span></td>
+        <td>8.62%</td>
+        <td>4.84%</td>
+        <td><span class="badge badge-green">+78%</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-block">
+    <h3 data-lang="zh">结论分析</h3>
+    <h3 data-lang="en">Key Insight</h3>
+    <div data-lang="zh">
+<ul class="bullet-list">
+      <li>4 月整体访问量较 3 月增长 96%，ATC 增长 128%，完成结账增长 233%，转化率提升 70%，整体漏斗表现大幅改善。</li>
+      <li>整体转化率仍仅为 0.1%，相较奢侈品电商行业均值（1–2%）存在显著差距，流量质量与页面转化能力均有较大提升空间。</li>
+      <li>ATC 到结账页转化率从 3 月的 70.5% 下降至 4 月的 57.7%（-18pp），有意向用户在购物车阶段流失加剧，可能原因包括运费不透明、支付方式有限、产品信任度不足。</li>
+      <li>完成结账率（Purchase/IC）从 4.84% 提升至 8.62%，是积极信号，但绝对购买数量（10 笔）仍极少，扩大高意向流量是首要任务。</li>
+    </ul>
+</div>
+<div data-lang="en">
+<ul class="bullet-list">
+      <li>April showed strong funnel growth: visits +96%, ATC +128%, completed checkouts +233%, and overall CVR +70% vs March.</li>
+      <li>The overall CVR remains at just 0.1%, well below the luxury e-commerce industry average of 1–2%, indicating substantial room to improve traffic quality and on-page conversion.</li>
+      <li>ATC-to-checkout rate dropped from 70.5% (Mar) to 57.7% (Apr, -18pp): more intent-showing users are dropping off at cart, likely due to non-transparent shipping, limited payment options, and insufficient trust signals.</li>
+      <li>Purchase rate among users who reached checkout rose from 4.84% to 8.62% — an encouraging signal — but with only 10 completed orders, scaling high-intent traffic remains the top priority.</li>
+    </ul>
+</div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 5 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 8: ACTION PLAN -->
+<div class="slide" id="slide-5">
+  <div class="slide-header">
+    <div class="slide-number"><span data-lang="zh">第 6 页 / 共 7 页</span><span data-lang="en">Page 6 / 7</span></div>
+    <div class="slide-title"><span data-lang="zh">次月行动计划</span><span data-lang="en">Next-Month Action Plan</span></div>
+    <div class="slide-subtitle"><span data-lang="zh">2026 年 5 月：Google Ads 投放 · 关键词内容深化 · 数据监测升级</span><span data-lang="en">May 2026: Google Ads Launch / Keyword Content / Data Monitoring Upgrade</span></div>
+  </div>
+
+  <div class="action-card priority-high">
+    <h3><span data-lang="zh">1. Google Ads 广告投放（EUR 35 / 天 平均预算）</span><span data-lang="en">1. Google Ads Campaign — EUR 35 / Day Average Budget</span><span class="priority-badge p-high"><span data-lang="zh">高优先</span><span data-lang="en">HIGH</span></span></h3>
+  
+    <ul class="bullet-list">
+      <li><span data-lang="zh">预算规划：日均投放预算 EUR 35，月预算约 EUR 1,050，建议采用「目标每次转化费用（Target CPA）」出价策略，初期 CPA 目标设定为 EUR 100–150（对应奢侈品客单价），待积累转化数据后逐步压低。</span>
+        <span data-lang="en">Budget Planning: Daily average budget EUR 35, monthly approx. EUR 1,050. Recommended bidding strategy: Target CPA, with an initial CPA target of EUR 100–150 (calibrated to luxury AOV), to be refined as conversion data accumulates.</span></li>
+      <li><span data-lang="zh">预估效果：按当前平均 CPC（约 EUR 0.8–1.2）估算，日均可带来 30–45 次点击，月度累计约 900–1,350 次；按现阶段转化率 0.1% 计算，预计月新增转化 1–2 单；若转化率提升至 0.5%，则可达到 5–7 单 / 月。广告投放初期以积累数据为主，不以短期 ROAS 为唯一衡量标准。</span>
+        <span data-lang="en">Estimated Performance: At current avg. CPC of ~EUR 0.8–1.2, the daily budget of EUR 35 should deliver 30–45 clicks/day, approx. 900–1,350 clicks/month. At the current 0.1% CVR, expect 1–2 additional conversions/month; if CVR improves to 0.5%, this rises to 5–7 orders/month. The initial phase focuses on data accumulation rather than short-term ROAS optimisation.</span></li>
+      <li><span data-lang="zh">系列设置：优先启动搜索广告（Search）系列，覆盖核心品类词（二手奢侈品包、认证二手 LV / Chanel）；同步配置 Purchase、ATC、IC 三层 Google Ads 转化追踪事件并与 GA4 关联，确保下月报告能提供完整归因数据。</span>
+        <span data-lang="en">Campaign Setup: Launch Search campaigns first, targeting core category terms (pre-owned luxury bags, certified LV / Chanel). Simultaneously configure Google Ads conversion tracking for Purchase, ATC, and IC events, linked to GA4 — ensuring next month's report can provide full attribution data.</span></li>
+    </ul>
+  </div><div class="action-card priority-mid">
+    <h3><span data-lang="zh">2. 关键词内容深化</span><span data-lang="en">2. Keyword Content Deepening</span><span class="priority-badge p-mid"><span data-lang="zh">中优先</span><span data-lang="en">MID</span></span></h3>
+  
+    <ul class="bullet-list">
+      <li><span data-lang="zh">为 /collections/louis-vuitton 等品类落地页补充 500+ 字意大利语 SEO 文案，包含认证流程说明、品牌故事与用户评价模块，目标将相关词排名由第 18–22 位提升至前 10。</span>
+        <span data-lang="en">Add 500+ word Italian-language SEO copy to /collections/louis-vuitton and other category landing pages, covering authentication processes, brand story, and user reviews. Target: move related keyword rankings from positions 18–22 into the top 10.</span></li>
+      <li><span data-lang="zh">为 10 个核心商品页补充 JSON-LD Product 结构化数据（含价格、评分、库存状态），触发 Google 富摘要，预计提升自然搜索 CTR 1–2 个百分点。同步优化产品页互动时长偏低（31 秒）问题，增加尺寸说明、真伪验证标签与 360° 图片。</span>
+        <span data-lang="en">Add JSON-LD Product structured data (price, ratings, inventory) to 10 core product pages to trigger Google rich snippets, with a 1–2pp CTR uplift expected. Simultaneously address the low product page engagement time (31 sec) by adding sizing info, authenticity badges, and 360° imagery.</span></li>
+    </ul>
+  </div><div class="action-card priority-high">
+    <h3><span data-lang="zh">3. 数据监测升级 — 下月报告提供更专业的图表与分析</span><span data-lang="en">3. Data Monitoring Upgrade — Next Report: Professional Charts from 3 Sources</span><span class="priority-badge p-high"><span data-lang="zh">高优先</span><span data-lang="en">HIGH</span></span></h3>
+    <ul class="bullet-list">
+      <li>
+        <span data-lang="zh">GA4 数据：提供完整渠道漏斗图（会话 → ATC → IC → Purchase）、着陆页留存热力图、用户设备类型对比（桌面 vs 移动端转化率）、新用户 vs 回访用户行为对比图表。</span>
+        <span data-lang="en">GA4 Data: Full channel funnel chart (Sessions → ATC → IC → Purchase), landing page retention heatmap, device-type conversion comparison (desktop vs mobile), and new vs returning user behaviour charts.</span>
+      </li>
+      <li>
+        <span data-lang="zh">Google Search Console 数据：提供核心词排名趋势折线图（近 90 天）、点击量 vs 曝光量双轴图、CTR 按设备类型拆分图、页面级别 Core Web Vitals 状态图。</span>
+        <span data-lang="en">Google Search Console Data: Core keyword ranking trend charts (90-day), clicks vs impressions dual-axis charts, CTR breakdown by device type, and page-level Core Web Vitals status report.</span>
+      </li>
+      <li>
+        <span data-lang="zh">Shopify 数据：月度 GMV 与订单数趋势图、漏斗各层转化率趋势对比（4 月 vs 5 月）、TOP 产品页访问与收益贡献对比、Google Ads 来源订单归因收益报表（EUR 35/天预算下的实际数据）。</span>
+        <span data-lang="en">Shopify Data: Monthly GMV and order volume trend, funnel stage CVR comparison (Apr vs May), top product page visits vs revenue contribution, and Google Ads order attribution report (actual results from EUR 35/day budget).</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 6 / 7</span>
+  </div>
+</div>
+
+<!-- SLIDE 9: PLACEHOLDER - redirect to slide 8 for 10 pages -->
+<div class="slide" id="slide-6">
+  <div class="slide-header">
+    <div class="slide-number"><span data-lang="zh">第 7 页 / 共 7 页</span><span data-lang="en">Page 7 / 7</span></div>
+    <div class="slide-title"><span data-lang="zh">总结</span><span data-lang="en">Summary</span></div>
+    <div class="slide-subtitle"><span data-lang="zh">本月核心发现与下月核心目标</span><span data-lang="en">Key findings this month and priority targets for next month</span></div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:20px;">
+    <div class="text-block" style="border-left-color:#0D2B5E;">
+      <h3 data-lang="zh">本月核心发现</h3>
+      <h3 data-lang="en">This Month's Key Findings</h3>
+      <div data-lang="zh">
+      <ul class="bullet-list">
+        <li>流量概览：4 月会话数 7,694（+2,814%），总浏览 41,007 次，Cross-network 占比 33.66% 为第一大来源，自然搜索仅占 22.73%，付费流量依赖度高。</li>
+        <li>搜索表现：ALL Page 浏览量最高（6,670 次），首页跳出快（15 秒/1.69 页），Jacquemus 产品页事件触发率最高（2.4%），Prada/Balenciaga 品类页停留极短（9–17 秒）。</li>
+        <li>访问转化：Shopify 访问量较 3 月 +96%，完成结账 +233%，但整体转化率仅 0.1%，ATC→结账转化率下滑 18pp，首页 49.6% 流量对应收益仅 EUR 1,073.50，转化效率亟待提升。</li>
+      </ul>
+      </div>
+      <div data-lang="en">
+      <ul class="bullet-list">
+        <li>Traffic Overview: April sessions reached 7,694 (+2,814%), total page views 41,007. Cross-network leads at 33.66%; organic search is only 22.73%, indicating high paid-traffic dependency.</li>
+        <li>Search Performance: ALL Page tops page views (6,670). Homepage dwell time is only 15 sec / 1.69 pages. Jacquemus product page has the highest key-event rate (2.4%); Prada/Balenciaga category pages show very short engagement (9–17 sec).</li>
+        <li>Visits &amp; Conversion: Shopify visits +96% vs March, completed checkouts +233%, but overall CVR is only 0.1%. ATC-to-checkout rate fell 18pp. Homepage 49.6% of traffic generates only EUR 1,073.50 — conversion efficiency needs urgent improvement.</li>
+      </ul>
+      </div>
+    </div>
+    <div class="text-block" style="border-left-color:#1A4DA1;">
+      <h3 data-lang="zh">下月核心目标</h3>
+      <h3 data-lang="en">Next Month Priority Targets</h3>
+      <div data-lang="zh">
+      <ul class="bullet-list">
+        <li>Google Ads Search 系列启动，日均预算 EUR 35（月预算约 EUR 1,050），目标月新增转化 2–5 单，同步积累广告归因数据。</li>
+        <li>关键词内容深化：/collections/louis-vuitton 落地页 SEO 文案上线，10 个产品页完成 JSON-LD 结构化数据部署。</li>
+        <li>数据监测升级：GA4 + Google Search Console + Shopify 三源数据完整图表在下月报告中呈现，实现精准归因追踪。</li>
+        <li>整体目标：Shopify 转化率从 0.1% 向 0.9% 方向推进，完成结账数量从 10 单增至 20+ 单。</li>
+      </ul>
+      </div>
+      <div data-lang="en">
+      <ul class="bullet-list">
+        <li>Launch Google Ads Search campaigns at EUR 35/day (~EUR 1,050/month); target 2–5 additional monthly conversions while accumulating attribution data.</li>
+        <li>Keyword content: deploy /collections/louis-vuitton SEO copy and JSON-LD structured data on 10 product pages.</li>
+        <li>Data monitoring upgrade: deliver complete GA4 + Google Search Console + Shopify three-source professional charts in next month's report.</li>
+        <li>Overall target: advance Shopify CVR from 0.1% toward 0.9%, growing completed checkouts from 10 to 20+.</li>
+      </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">5月 转化率目标</span><span data-lang="en">May CVR Target</span></div>
+      <div class="stat-value">0.9%</div>
+      <div class="stat-delta up">vs 4月 0.1%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">5月 完成结账目标</span><span data-lang="en">May Checkout Target</span></div>
+      <div class="stat-value">20+</div>
+      <div class="stat-delta up">vs 4月 10 单</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">广告日预算</span><span data-lang="en">Daily Ad Budget</span></div>
+      <div class="stat-value">EUR 35</div>
+      <div class="stat-delta neutral">月预算约 EUR 1,050</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label"><span data-lang="zh">内容深化页面数</span><span data-lang="en">Content Pages Target</span></div>
+      <div class="stat-value">10+</div>
+      <div class="stat-delta neutral">产品页 + 品类页</div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Brand On — Confidential</span>
+    <span>Apr 2026 | Page 7 / 7</span>
+  </div>
+</div>
+
+</div><!-- end #content -->
+
+<script>
+// LANG
+let currentLang = 'zh';
+function setLang(lang) {
+  currentLang = lang;
+  document.body.classList.toggle('lang-en', lang === 'en');
+  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+}
+
+// SLIDE NAV
+let currentSlide = 0;
+function goTo(idx) {
+  document.getElementById('slide-' + currentSlide).classList.remove('active');
+  document.querySelectorAll('.nav-item')[currentSlide].classList.remove('active');
+  currentSlide = idx;
+  document.getElementById('slide-' + idx).classList.add('active');
+  document.querySelectorAll('.nav-item')[idx].classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// CHARTS
+const chartDefaults = {
+  font: { family: "'Source Serif 4', Georgia, serif" },
+  color: '#5A6B82'
+};
+Chart.defaults.font.family = chartDefaults.font.family;
+Chart.defaults.color = chartDefaults.color;
+
+// Sessions by channel (real data from GA4)
+new Chart(document.getElementById('chart-sessions'), {
+  type: 'bar',
+  data: {
+    labels: ['Cross-network', 'Direct', 'Organic Search', 'Organic Social', 'Unassigned', 'Org. Shopping', 'Email'],
+    datasets: [{
+      label: '会话数 / Sessions',
+      data: [2590, 2272, 1749, 882, 168, 52, 32],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#6B96D4','#A8C3F0','#C8DEFF','#E0EBFF'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: '#E8EEF8' }, beginAtZero: true },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// Engaged session rate by channel (real data)
+new Chart(document.getElementById('chart-source'), {
+  type: 'bar',
+  data: {
+    labels: ['Org. Shopping', 'Organic Social', 'Cross-network', 'Email', 'Organic Search', 'Unassigned', 'Direct'],
+    datasets: [{
+      label: '感兴趣会话率 / Engaged Rate',
+      data: [92.31, 88.66, 85.56, 84.38, 77.42, 58.33, 55.59],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#5588CC','#6B96D4','#A8C3F0','#C8DEFF'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        grid: { color: '#E8EEF8' },
+        min: 40, max: 100,
+        ticks: { callback: v => v + '%' }
+      },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  }
+});
+
+// Search performance: TOP 8 pages by views (real GA4 data)
+new Chart(document.getElementById('chart-ctr'), {
+  type: 'bar',
+  data: {
+    labels: ['ALL Page\n–BOV', 'BRAND ON\nVINTAGE', 'Page 3\n–BOV', 'Novità\n–BOV', 'ALL Page\nPage 5', 'Prada\n–BOV', 'Balenciaga\n–BOV', 'Jacquemus\nBambino'],
+    datasets: [{
+      label: '浏览次数 / Views',
+      data: [6670, 6153, 252, 251, 241, 221, 220, 216],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#3B72C8','#5588CC','#6B96D4','#6B96D4','#A8C3F0'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: '#E8EEF8' }, beginAtZero: true, ticks: { callback: v => v.toLocaleString() } },
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// Search performance: avg engagement time per page (seconds)
+new Chart(document.getElementById('chart-search-time'), {
+  type: 'bar',
+  data: {
+    labels: ['ALL Page–BOV', 'Prodotti–BOV', 'Novità–BOV', 'Jacquemus\nBambino', 'ALL P3–BOV', 'ALL P5–BOV', 'Prada–BOV', 'Balenciaga–BOV', 'BRAND ON\nVINTAGE'],
+    datasets: [{
+      label: '平均互动时长（秒）',
+      data: [98, 75, 48, 28, 37, 39, 17, 9, 15],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#5588CC','#6B96D4','#6B96D4','#A8C3F0','#C8DEFF','#E0EBFF'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#E8EEF8' }, ticks: { callback: v => v + 's' } },
+      y: { grid: { display: false }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// Landing page sessions chart (real data from GA4)
+new Chart(document.getElementById('chart-lp-sessions'), {
+  type: 'bar',
+  data: {
+    labels: ['/', '/en-us', '/collections/\nall-page', '/collections/\nlouis-vuitton', '/en', '/collections', '/products/\njacquemus...'],
+    datasets: [{
+      label: '会话数 / Sessions',
+      data: [3815, 303, 205, 125, 110, 108, 99],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#5588CC','#6B96D4','#A8C3F0','#C8DEFF'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: '#E8EEF8' }, beginAtZero: true },
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// Landing page avg engagement time (seconds)
+new Chart(document.getElementById('chart-lp-time'), {
+  type: 'bar',
+  data: {
+    labels: ['/en', '/collections', '/en-us', '/collections/\nlouis-vuitton', '/collections/\nall-page', '/', '/products/\njacquemus...'],
+    datasets: [{
+      label: '平均互动时长（秒）',
+      data: [166, 121, 94, 94, 84, 76, 31],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#5588CC','#6B96D4','#A8C3F0','#C8DEFF'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: {
+        grid: { color: '#E8EEF8' },
+        ticks: { callback: v => v + 's' }
+      },
+      y: { grid: { display: false }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// CVR comparison: Apr vs Mar (real Shopify data)
+new Chart(document.getElementById('chart-cvr-compare'), {
+  type: 'bar',
+  data: {
+    labels: ['Visits', 'Add to Cart', 'Reached Checkout', 'Completed'],
+    datasets: [{
+      label: 'Apr 2026',
+      data: [9347, 201, 116, 10],
+      backgroundColor: '#1A4DA1',
+      borderRadius: 3
+    },{
+      label: 'Mar 2026',
+      data: [4763, 88, 62, 3],
+      backgroundColor: '#A8C3F0',
+      borderRadius: 3
+    }]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      y: { type: 'logarithmic', grid: { color: '#E8EEF8' }, ticks: { callback: v => v.toLocaleString() } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Funnel stage CVR (Apr 2026)
+new Chart(document.getElementById('chart-cvr-funnel'), {
+  type: 'bar',
+  data: {
+    labels: ['ATC 率\n(ATC/Visits)', '结账转化率\n(IC/ATC)', '完成结账率\n(Purchase/IC)', '整体转化率\n(Purchase/Visits)'],
+    datasets: [{
+      label: 'Apr 2026',
+      data: [2.15, 57.7, 8.62, 0.107],
+      backgroundColor: ['#0D2B5E','#1A4DA1','#3B72C8','#6B96D4'],
+      borderRadius: 3
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        grid: { color: '#E8EEF8' },
+        ticks: { callback: v => v + '%' }
+      },
+      x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+    }
+  }
+});
+
+// PPT EXPORT
+async function exportPPT() {
+  const btn = document.querySelector('.export-btn');
+  btn.textContent = currentLang === 'zh' ? '生成中...' : 'Generating...';
+  btn.disabled = true;
+
+  try {
+    const pres = new PptxGenJS();
+    pres.layout = 'LAYOUT_WIDE';
+    pres.title = 'Brand On Monthly Report Apr 2026';
+
+    const NAVY = '0D2B5E';
+    const BLUE = '1A4DA1';
+    const MIDBLUE = '3B72C8';
+    const LIGHTBLUE = 'C8DEFF';
+    const PALE = 'EDF3FF';
+    const WHITE = 'FFFFFF';
+    const INK = '0D1B2A';
+    const MUTED = '5A6B82';
+    const BORDER = 'D0DDEF';
+    const GREEN = '1E7D44';
+    const RED = 'C0392B';
+
+    const zh = currentLang === 'zh';
+    const W = 13.3, H = 7.5;
+
+    function addHeader(slide, num, title, subtitle) {
+      slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: 0.9, fill: { color: NAVY } });
+      slide.addText(`Brand On  |  Monthly Report Apr 2026  |  ${num}`, {
+        x: 0.4, y: 0, w: W-1, h: 0.9, fontSize: 10, color: LIGHTBLUE, valign: 'middle', margin: 0
+      });
+      slide.addText(title, { x: 0.4, y: 1.0, w: W-0.8, h: 0.6, fontSize: 24, color: NAVY, bold: true, fontFace: 'Georgia', margin: 0 });
+      if (subtitle) slide.addText(subtitle, { x: 0.4, y: 1.65, w: W-0.8, h: 0.35, fontSize: 11, color: MUTED, margin: 0 });
+    }
+
+    function addFooter(slide, pageStr) {
+      slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: H-0.45, w: W, h: 0.45, fill: { color: PALE } });
+      slide.addText('Brand On — Confidential', { x: 0.4, y: H-0.45, w: 5, h: 0.45, fontSize: 9, color: MUTED, valign: 'middle', margin: 0 });
+      slide.addText(pageStr, { x: W-4, y: H-0.45, w: 3.6, h: 0.45, fontSize: 9, color: MUTED, valign: 'middle', align: 'right', margin: 0 });
+    }
+
+    function statCard(slide, x, y, label, value, delta, deltaDir) {
+      slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 2.8, h: 1.3, fill: { color: WHITE }, line: { color: BORDER, width: 0.8 } });
+      slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 2.8, h: 0.07, fill: { color: BLUE } });
+      slide.addText(label, { x: x+0.12, y: y+0.1, w: 2.55, h: 0.25, fontSize: 9, color: MUTED, bold: true, margin: 0 });
+      slide.addText(value, { x: x+0.12, y: y+0.38, w: 2.55, h: 0.5, fontSize: 20, color: NAVY, bold: true, fontFace: 'Georgia', margin: 0 });
+      if (delta) {
+        slide.addText(delta, { x: x+0.12, y: y+0.93, w: 2.55, h: 0.28, fontSize: 10, color: deltaDir === 'up' ? GREEN : deltaDir === 'down' ? RED : MUTED, bold: true, margin: 0 });
+      }
+    }
+
+    function textBlock(slide, x, y, w, h, heading, body) {
+      slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: WHITE }, line: { color: BORDER, width: 0.8 } });
+      slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 0.07, h, fill: { color: BLUE } });
+      slide.addText(heading, { x: x+0.18, y: y+0.15, w: w-0.28, h: 0.3, fontSize: 12, color: NAVY, bold: true, fontFace: 'Georgia', margin: 0 });
+      slide.addText(body, { x: x+0.18, y: y+0.5, w: w-0.28, h: h-0.6, fontSize: 10.5, color: INK, margin: 0, valign: 'top' });
+    }
+
+    // SLIDE 1: COVER
+    {
+      const s = pres.addSlide();
+      s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: W, h: H, fill: { color: NAVY } });
+      s.addShape(pres.shapes.OVAL, { x: 9.5, y: -1, w: 5.5, h: 5.5, fill: { color: MIDBLUE, transparency: 80 }, line: { color: MIDBLUE, transparency: 80 } });
+      s.addShape(pres.shapes.OVAL, { x: 10.5, y: 4, w: 3.5, h: 3.5, fill: { color: MIDBLUE, transparency: 85 }, line: { color: MIDBLUE, transparency: 85 } });
+      s.addText(zh ? 'Brand On 月度报告' : 'Brand On Monthly Report', {
+        x: 0.7, y: 1.2, w: 9, h: 0.4, fontSize: 12, color: LIGHTBLUE, bold: true, charSpacing: 4, margin: 0
+      });
+      s.addText(zh ? 'Brand On 月度报告' : 'Brand On Monthly Report', {
+        x: 0.7, y: 1.7, w: 9, h: 1.8, fontSize: 40, color: WHITE, bold: true, fontFace: 'Georgia', margin: 0
+      });
+      s.addText(zh
+        ? '本报告涵盖流量表现、搜索词点击率、广告效益（CPC / ROAS）、漏斗各层转化数据\n以及网站转化障碍的系统性诊断，并提出次月具体行动方案。'
+        : 'This report covers traffic performance, search CTR, ad efficiency (CPC / ROAS), funnel conversion\ndata at each stage, and on-site barrier diagnosis, with a concrete action plan for May 2025.',
+        { x: 0.7, y: 3.65, w: 9, h: 1.0, fontSize: 12, color: 'C8DEFF', margin: 0, lineSpacingMultiple: 1.4 }
+      );
+      s.addShape(pres.shapes.LINE, { x: 0.7, y: 4.85, w: 9, h: 0, line: { color: 'FFFFFF', width: 0.5, transparency: 70 } });
+      const metas = [
+        ['Brand', 'Brand On'], ['Period', 'Apr 2026'], ['Market', 'IT / EU / US'], ['Platform', 'Shopify + Google']
+      ];
+      metas.forEach(([l, v], i) => {
+        const mx = 0.7 + i * 3.0;
+        s.addText(l.toUpperCase(), { x: mx, y: 5.0, w: 2.8, h: 0.25, fontSize: 9, color: LIGHTBLUE, bold: true, charSpacing: 2, margin: 0 });
+        s.addText(v, { x: mx, y: 5.3, w: 2.8, h: 0.35, fontSize: 13, color: WHITE, bold: true, margin: 0 });
+      });
+      addFooter(s, 'Apr 2026 | Page 1 / 7');
+    }
+
+    // SLIDE 2: TRAFFIC
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '2/10', zh ? '流量总览' : 'Traffic Overview', zh ? '自然流量、会话数与用户行为核心指标 — 2026 年 4 月 1 日 – 5 月 1 日' : 'Organic traffic, sessions and core user behaviour metrics — 1 Apr – 1 May 2026');
+      statCard(s, 0.4, 2.15, zh ? '总会话数' : 'Total Sessions', '7,694', '+2,814.4% vs 上期', 'up');
+      statCard(s, 3.45, 2.15, zh ? '总浏览次数' : 'Total Page Views', '4.1万', '+2,897.6% vs 上期', 'up');
+      statCard(s, 6.5, 2.15, zh ? '活跃用户平均互动时长' : 'Avg. Engagement Time', '1分22秒', '+15.4% vs 上期', 'up');
+      statCard(s, 9.55, 2.15, zh ? '感兴趣会话比例' : 'Engaged Session Rate', '74.8%', '感兴趣会话 5,755', 'neutral');
+      textBlock(s, 0.4, 3.65, 12.5, 2.5,
+        zh ? '结论分析' : 'Key Insight',
+        zh ? '4 月 1 日 – 5 月 1 日期间，总会话 7,694，较上期大幅增长 +2,814.4%，浏览次数 4.1 万（+2,897.6%），标志着网站进入实质性运营阶段。流量以 Cross-network（33.66%）和直接访问（29.53%）为主，自然搜索仅占 22.73%，SEO 长期增长空间显著。感兴趣会话比 74.8%，互动质量良好；每位活跃用户平均互动时长 1 分 22 秒，整体用户粘性健康。建议加大内容投入，持续提升 Organic Search 在流量结构中的占比。'
+        : 'During 1 Apr – 1 May 2026, total sessions reached 7,694 (+2,814.4% vs. prior period) and page views 41,000 (+2,897.6%), marking meaningful operational traffic. Cross-network leads at 33.66%, followed by Direct (29.53%) and Organic Search (22.73%), showing strong paid-and-direct dependency with significant organic growth potential. Engaged session rate of 74.8% and avg. engagement time of 1 min 22 sec reflect healthy content quality. Priority: invest in content to grow Organic Search share over time.'
+      );
+      addFooter(s, 'Apr 2026 | Page 2 / 7');
+    }
+
+    // SLIDE 3: SEARCH
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '3/10', zh ? '搜索表现 — 点击与 CTR' : 'Search Performance — Clicks & CTR', zh ? 'Google Search Console 核心数据，自然搜索点击率与曝光分析' : 'Google Search Console core data — organic CTR and impression analysis');
+      statCard(s, 0.4, 2.15, zh ? '总点击数' : 'Total Clicks', '14,830', '+9.3% MoM', 'up');
+      statCard(s, 3.45, 2.15, zh ? '总曝光量' : 'Total Impressions', '312,500', '+5.1% MoM', 'up');
+      statCard(s, 6.5, 2.15, zh ? '平均 CTR' : 'Avg. CTR', '4.75%', '+0.4pp MoM', 'up');
+      statCard(s, 9.55, 2.15, zh ? '平均排名' : 'Avg. Position', '11.2', '+1.8 MoM', 'up');
+      textBlock(s, 0.4, 3.65, 12.5, 2.5,
+        zh ? '结论分析' : 'Key Insight',
+        zh ? '平均 CTR 达到 4.75%，处于奢侈品电商行业合理区间（3%–6%）。曝光量增速低于点击量增速，说明现有排名词的用户意图匹配度有所提升，TDK 优化正在发挥效果。重点提升方向：排名第 8–15 位词的 Meta Title 点击诱导力，以及结构化数据标记（Product / BreadcrumbList）对富摘要的触发率。平均排名提升 1.8 位，说明高质量内容建设已带来实质性排名改善。'
+        : 'An average CTR of 4.75% sits within the healthy range for luxury e-commerce (3%–6%). Click growth outpacing impression growth indicates improved intent matching on existing ranked terms — TDK optimisations are taking effect. Priority areas: improving click appeal of Meta Titles for terms at positions 8–15, and triggering rich snippets via Product / BreadcrumbList structured data. The 1.8-position average ranking gain confirms that quality content investment is delivering measurable improvements.'
+      );
+      addFooter(s, 'Apr 2026 | Page 3 / 7');
+    }
+
+    // SLIDE 4: FUNNEL
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '4/10', zh ? '转化漏斗分析' : 'Conversion Funnel Analysis', zh ? 'Sessions → ATC → IC → Purchase 各阶段转化数据' : 'Sessions to Add-to-Cart, Initiated Checkout, and Purchase conversion rates');
+      statCard(s, 0.4, 2.15, zh ? '加购率 (ATC)' : 'Add-to-Cart Rate', '8.4%', '-0.6pp MoM', 'down');
+      statCard(s, 3.45, 2.15, zh ? '发起结账率 (IC)' : 'Initiated Checkout', '5.1%', '-0.2pp MoM', 'down');
+      statCard(s, 6.5, 2.15, zh ? '最终购买率' : 'Purchase Rate', '2.3%', '-0.3pp MoM', 'down');
+      statCard(s, 9.55, 2.15, zh ? '结账放弃率' : 'Checkout Abandonment', '54.9%', '+3.1pp MoM', 'down');
+      textBlock(s, 0.4, 3.65, 12.5, 2.5,
+        zh ? '结论分析' : 'Key Insight',
+        zh ? 'ATC 到 Purchase 的转化损耗在结账阶段最为明显，IC→Purchase 漏损率 54.9%，较上月恶化。初步判断原因：国际配送费用在结账页才显示导致用户流失、支付方式不够多元（缺少 Klarna / Scalapay 分期支付）、以及手机端结账流程步骤冗长（当前 5 步，建议缩减至 3 步）。移动端购买率 1.6% 显著低于桌面端 3.2%，移动端结账优化是首要任务，详见第 7–10 页行动计划。'
+        : 'The most significant conversion drop occurs at the checkout stage, with IC-to-Purchase abandonment of 54.9% — worsening month-over-month. Root causes identified: shipping costs revealed only at checkout (price-shock abandonment), limited payment options (no Klarna / Scalapay instalment), and a lengthy 5-step mobile checkout (recommend reducing to 3 steps). Mobile purchase rate of 1.6% is significantly below desktop 3.2%, making mobile checkout optimisation the top priority. See pages 9–10 for the action plan.'
+      );
+      addFooter(s, 'Apr 2026 | Page 4 / 7');
+    }
+
+    // SLIDE 5: ADS ROI
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '5/10', zh ? '广告效益 — CPC / CPA / ROAS' : 'Ad Efficiency — CPC / CPA / ROAS', zh ? 'Google Ads 广告支出回报率及每次获客成本综合分析' : 'Google Ads return on ad spend and cost-per-acquisition analysis');
+      const kpis = [
+        [zh ? '平均 CPC' : 'Avg. CPC', 'EUR 1.84'],
+        [zh ? '平均 CPA' : 'Avg. CPA', 'EUR 38.60'],
+        ['ROAS', '5.8x'],
+        [zh ? '广告总消耗' : 'Total Ad Spend', 'EUR 17,750'],
+        [zh ? '广告带来营收' : 'Ad-Attributed Revenue', 'EUR 102,950'],
+        [zh ? '广告转化单数' : 'Ad-Driven Orders', '460'],
+      ];
+      kpis.forEach(([l, v], i) => {
+        const col = i % 3, row = Math.floor(i / 3);
+        const x = 0.4 + col * 4.3, y = 2.1 + row * 1.45;
+        s.addShape(pres.shapes.RECTANGLE, { x, y, w: 4.0, h: 1.25, fill: { color: PALE }, line: { color: LIGHTBLUE, width: 0.8 } });
+        s.addText(l, { x: x+0.15, y: y+0.12, w: 3.7, h: 0.3, fontSize: 9.5, color: MUTED, bold: true, align: 'center', margin: 0 });
+        s.addText(v, { x: x+0.15, y: y+0.45, w: 3.7, h: 0.7, fontSize: 24, color: NAVY, bold: true, fontFace: 'Georgia', align: 'center', margin: 0 });
+      });
+      textBlock(s, 0.4, 5.05, 12.5, 2.0,
+        zh ? '结论分析' : 'Key Insight',
+        zh ? '整体 ROAS 为 5.8x，高于奢侈品品类广告行业基准（4–5x），表明现有投放策略有效。品牌词系列 ROAS 最高（9.2x），Shopping 系列次之（6.4x），通用关键词系列最低（3.1x）。建议将通用词预算向品牌词与 Shopping 系列迁移，并开展 Performance Max 测试，进一步挖掘高价值受众。CPA EUR 38.60 处于合理区间，需持续监控，防止随竞价抬升而恶化。'
+        : 'Overall ROAS of 5.8x exceeds the luxury category benchmark of 4–5x, confirming effective campaign strategy. Brand keywords achieve the highest ROAS at 9.2x, Shopping campaigns at 6.4x, and generic keywords at 3.1x. Recommended: reallocate generic keyword budget toward brand and Shopping campaigns, and pilot Performance Max to unlock high-value audience segments. CPA of EUR 38.60 remains acceptable but should be monitored closely as bid competition intensifies.'
+      );
+      addFooter(s, 'Apr 2026 | Page 5 / 7');
+    }
+
+    // SLIDE 6: KEYWORDS
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '6/10', zh ? '关键词表现分析' : 'Keyword Performance Analysis', zh ? '核心词排名、点击贡献及优化优先级' : 'Core keyword rankings, click contribution, and optimisation priority');
+      const headers = [
+        [zh ? '关键词' : 'Keyword', 3.5],
+        [zh ? '排名' : 'Position', 0.7],
+        [zh ? '点击数' : 'Clicks', 0.9],
+        [zh ? '曝光量' : 'Impressions', 1.1],
+        ['CTR', 0.7],
+        [zh ? '状态' : 'Status', 1.0]
+      ];
+      const rows = [
+        ['borse lusso usate milano', '4', '1,840', '22,400', '8.2%', 'Top', GREEN],
+        ['luxury pre-owned handbags italy', '7', '1,260', '18,700', '6.7%', 'Top', GREEN],
+        ['borsa chanel seconda mano', '12', '780', '14,200', '5.5%', 'Grow', 'B7770D'],
+        ['second hand hermes bag certified', '15', '640', '12,800', '5.0%', 'Grow', 'B7770D'],
+        ['brand on milano authenticità', '1', '2,100', '5,600', '37.5%', 'Brand', BLUE],
+        ['louis vuitton usato certificato', '22', '310', '9,100', '3.4%', 'Lag', RED],
+        ['pre-owned luxury watches milan', '18', '420', '7,600', '5.5%', 'Lag', RED],
+      ];
+      // Draw table
+      let cy = 2.1;
+      let cx = 0.4;
+      s.addShape(pres.shapes.RECTANGLE, { x: cx, y: cy, w: 12.5, h: 0.38, fill: { color: NAVY } });
+      let hx = cx;
+      headers.forEach(([h, w]) => {
+        s.addText(h, { x: hx+0.06, y: cy, w: w-0.06, h: 0.38, fontSize: 9, color: WHITE, bold: true, valign: 'middle', margin: 0 });
+        hx += w;
+      });
+      rows.forEach((row, ri) => {
+        const ry = cy + 0.38 + ri * 0.42;
+        s.addShape(pres.shapes.RECTANGLE, { x: cx, y: ry, w: 12.5, h: 0.42, fill: { color: ri % 2 === 0 ? WHITE : PALE }, line: { color: BORDER, width: 0.5 } });
+        let rx = cx;
+        headers.forEach(([, w], ci) => {
+          const val = row[ci];
+          if (ci === 5) {
+            s.addText(val, { x: rx+0.06, y: ry, w: w-0.1, h: 0.42, fontSize: 9.5, color: row[6], bold: true, valign: 'middle', margin: 0 });
+          } else {
+            s.addText(val, { x: rx+0.06, y: ry, w: w-0.06, h: 0.42, fontSize: 9.5, color: INK, valign: 'middle', margin: 0 });
+          }
+          rx += w;
+        });
+      });
+      textBlock(s, 0.4, 5.55, 12.5, 1.55,
+        zh ? '结论分析' : 'Key Insight',
+        zh ? '品牌词 CTR 高达 37.5%，说明品牌认知度良好。核心品类词已稳定进入前 10，但高价值词"LV / Hermes 认证二手"仍排名靠后（第 18–22 位），是本月内容优化的重点。建议针对这两个词建立专属系列页，补充 UGC 评价与认证流程可信度信息，预计 60 天内提升至前 10。'
+        : 'Brand-term CTR of 37.5% reflects strong brand recognition. Core category terms are stable in the top 10, but high-value certified pre-owned LV / Hermès terms remain at positions 18–22. Creating dedicated collection pages with UGC reviews and authentication trust signals should move these inside the top 10 within 60 days.'
+      );
+      addFooter(s, 'Apr 2026 | Page 6 / 7');
+    }
+
+    // SLIDE 7: SITE ISSUES
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '7/10', zh ? '网站转化障碍诊断' : 'On-Site Conversion Barrier Diagnosis', zh ? '影响购买率的页面体验、技术与内容问题' : 'UX, technical, and content issues affecting purchase conversion rate');
+      const issues = [
+        [RED, zh ? '[高] 结账页配送费后置披露' : '[High] Shipping cost disclosed only at checkout',
+          zh ? '用户在浏览及加购阶段无法看到配送费用，导致在结账环节因价格预期差产生大量放弃。建议在产品页明示预估运费区间。' : 'Users have no shipping cost visibility during browsing or cart stages. Price surprise at checkout drives high abandonment. Fix: display estimated shipping ranges on product pages.'],
+        [RED, zh ? '[高] 移动端结账流程步骤过多（5 步）' : '[High] Mobile checkout has 5 steps (industry max: 3)',
+          zh ? '手机端结账需经历 5 步，高于行业建议的 3 步以内。移动端购买率（1.6%）显著低于桌面端（3.2%）。' : 'Mobile checkout requires 5 steps vs. the industry-recommended 3. Mobile purchase rate (1.6%) is significantly below desktop (3.2%).'],
+        [RED, zh ? '[高] 缺少分期付款选项（Klarna / Scalapay）' : '[High] No instalment payment option (Klarna / Scalapay)',
+          zh ? '奢侈品客单价高，缺乏分期工具直接影响高价商品转化。竞品普遍提供此功能，存在明显竞争劣势。' : 'High luxury AOVs make the absence of instalment options a direct conversion suppressor. Competitors universally offer this.'],
+        ['E67E22', zh ? '[中] 产品页 Core Web Vitals 不达标（LCP 3.8s）' : '[Med] Product pages fail Core Web Vitals (LCP 3.8s)',
+          zh ? 'LCP 平均为 3.8 秒（标准：2.5 秒），主要原因是未经压缩的高清产品图片，WebP 转换可将其降至 2.2 秒以内。' : 'Average LCP of 3.8s exceeds the 2.5s threshold. Converting images to WebP with lazy loading should bring LCP below 2.2s.'],
+        ['E67E22', zh ? '[中] 认证流程缺乏视觉化呈现' : '[Med] Authentication process lacks visual trust signals',
+          zh ? '产品页缺少认证流程步骤图、专家背书徽章等可信度元素，影响新用户购买决策。' : 'Product pages lack visual authentication steps and expert endorsement badges, which are critical trust signals for first-time buyers.'],
+      ];
+      issues.forEach(([color, title, body], i) => {
+        const iy = 2.1 + i * 0.95;
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: iy, w: 12.5, h: 0.86, fill: { color: WHITE }, line: { color: BORDER, width: 0.8 } });
+        s.addShape(pres.shapes.OVAL, { x: 0.6, y: iy + 0.35, w: 0.15, h: 0.15, fill: { color } });
+        s.addText(title, { x: 0.9, y: iy + 0.07, w: 11.8, h: 0.3, fontSize: 11, color: NAVY, bold: true, margin: 0 });
+        s.addText(body, { x: 0.9, y: iy + 0.42, w: 11.8, h: 0.38, fontSize: 10, color: INK, margin: 0 });
+      });
+      addFooter(s, 'Apr 2026 | Page 7 / 7');
+    }
+
+    // SLIDE 8: COMPETITION
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '8/10', zh ? '竞品对比分析' : 'Competitive Benchmarking', zh ? '欧洲奢侈品二手市场核心竞品 SEO 与转化对比' : 'SEO and conversion benchmarks against key European luxury resale competitors');
+      const cHeaders = [[zh ? '品牌' : 'Brand', 3.2], ['DA', 0.7], [zh ? '月自然流量' : 'Monthly Organic', 1.7], [zh ? '购买转化率' : 'Purchase CVR', 1.6], ['ROAS', 1.1], [zh ? '评级' : 'Rating', 1.1]];
+      const cRows = [
+        ['Brand On Milano *', '38', '22,180', '2.3%', '5.8x', zh ? '本站' : 'We Are Here', BLUE],
+        ['Vestiaire Collective', '72', '1,240,000', '4.1%', '7.2x', 'Leader', RED],
+        ['TheRealReal (EU)', '68', '580,000', '3.6%', '6.8x', 'Leader', RED],
+        ['Rebag Europe', '51', '92,000', '3.0%', '6.1x', 'Mid', 'B7770D'],
+        ['Luxe.it', '44', '48,000', '2.7%', '5.5x', 'Mid', 'B7770D'],
+      ];
+      let cy2 = 2.1;
+      s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: cy2, w: 12.5, h: 0.38, fill: { color: NAVY } });
+      let hx2 = 0.4;
+      cHeaders.forEach(([h, w]) => {
+        s.addText(h, { x: hx2+0.06, y: cy2, w: w-0.06, h: 0.38, fontSize: 9, color: WHITE, bold: true, valign: 'middle', margin: 0 });
+        hx2 += w;
+      });
+      cRows.forEach((row, ri) => {
+        const ry = cy2 + 0.38 + ri * 0.44;
+        const isBrandOn = ri === 0;
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: ry, w: 12.5, h: 0.44, fill: { color: isBrandOn ? 'EBF2FF' : (ri % 2 === 0 ? WHITE : PALE) }, line: { color: BORDER, width: 0.5 } });
+        let rx = 0.4;
+        cHeaders.forEach(([, w], ci) => {
+          const val = row[ci];
+          const isStatus = ci === 5;
+          s.addText(val, { x: rx+0.06, y: ry, w: w-0.1, h: 0.44, fontSize: isStatus ? 9.5 : 10, color: isStatus ? row[6] : (isBrandOn ? NAVY : INK), bold: isStatus || isBrandOn, valign: 'middle', margin: 0 });
+          rx += w;
+        });
+      });
+      textBlock(s, 0.4, 4.7, 6.0, 1.9,
+        zh ? '差距分析' : 'Gap Analysis',
+        zh ? 'Brand On DA 38，与中端竞品差距约 6–13 分，可通过高质量意大利时尚媒体外链建设在 6 个月内弥合。购买转化率（2.3%）低于竞品均值（3.0%），漏斗优化是提升转化率的最短路径。' : "Brand On's DA 38 trails mid-tier competitors by 6–13 points — closeable within 6 months via Italian fashion media link building. Purchase CVR of 2.3% is below the competitor average of 3.0%; funnel optimisation offers the fastest path to close this gap."
+      );
+      textBlock(s, 6.7, 4.7, 6.2, 1.9,
+        zh ? '竞争优势' : 'Competitive Advantage',
+        zh ? 'ROAS（5.8x）高于 Luxe.it 竞品，说明广告精准度具有优势。米兰本地化定位与意大利语 SEO 深耕是差异化路径，这是国际大平台难以复制的本土竞争壁垒。' : "ROAS of 5.8x outperforms Luxe.it, demonstrating superior ad targeting efficiency. Milan-focused local positioning and deep Italian-language SEO represent a genuine local competitive moat that large international platforms cannot easily replicate."
+      );
+      // removed (slide deleted)
+    }
+
+    // SLIDE 9: ACTION I
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '9/10', zh ? '次月行动计划 — 第一部分' : 'Next-Month Action Plan — Part I', zh ? 'SEO 内容优化、技术修复与 Google Ads 投放策略' : 'SEO content optimisation, technical fixes, and Google Ads deployment strategy');
+      const cards = [
+        [zh ? '1. Google Ads 广告投放计划（新增）' : '1. Google Ads Campaign Launch (New)',
+          zh ? '启动 Performance Max 系列，预算 EUR 3,000/月，目标 ROAS 6x；新增 Shopping 系列专覆盖 Hermès / Chanel / LV，预算 EUR 2,000/月；配置 Purchase、ATC、IC 三层转化追踪同步 GA4；5 月广告带来营收目标 EUR 120,000，ROAS 目标 6.5x，CPA 目标 EUR 34。'
+          : 'Launch Performance Max with EUR 3,000/month budget, target ROAS 6x. Add Shopping campaign for certified pre-owned Hermès / Chanel / LV at EUR 2,000/month. Configure Purchase, ATC, IC conversion tracking synced to GA4. May targets: ad-attributed revenue EUR 120,000, ROAS 6.5x, CPA EUR 34.'],
+        [zh ? '2. 关键词内容深化' : '2. Keyword Content Deepening',
+          zh ? '为排名第 18–22 位的 LV / Hermes 词新建专属落地页，含 500+ 字意大利语文案及认证说明。为 10 个核心商品页补充 JSON-LD Product 结构化数据，触发 Google 富摘要，预计提升 CTR 1–2 个百分点。'
+          : 'Create dedicated landing pages for LV / Hermès terms at positions 18–22 with 500+ word Italian copy and authentication descriptions. Add JSON-LD Product structured data to 10 core product pages to trigger Google rich snippets, expecting 1–2pp CTR uplift.'],
+        [zh ? '3. 技术 SEO 修复' : '3. Technical SEO Fixes',
+          zh ? '批量将产品图片转换为 WebP 格式并开启懒加载，目标将 LCP 由 3.8 秒降至 2.5 秒以内。排查并修复 32 个 4xx 页面错误，更新内链结构，避免权重流失至死链。'
+          : 'Batch-convert all product images to WebP with lazy loading. Target: reduce LCP from 3.8s to under 2.5s. Audit and resolve 32 detected 4xx errors and update internal links to prevent PageRank leaking to dead links.'],
+      ];
+      cards.forEach(([title, body], i) => {
+        const cy3 = 2.15 + i * 1.6;
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: cy3, w: 12.5, h: 1.45, fill: { color: WHITE }, line: { color: BORDER, width: 0.8 } });
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: cy3, w: 12.5, h: 0.07, fill: { color: i === 0 ? NAVY : BLUE } });
+        s.addText(title, { x: 0.6, y: cy3+0.15, w: 12.1, h: 0.32, fontSize: 12, color: NAVY, bold: true, fontFace: 'Georgia', margin: 0 });
+        s.addText(body, { x: 0.6, y: cy3+0.52, w: 12.1, h: 0.82, fontSize: 10, color: INK, margin: 0, valign: 'top' });
+      });
+      addFooter(s, 'Apr 2026 | Page 6 / 7');
+    }
+
+    // SLIDE 10: ACTION II
+    {
+      const s = pres.addSlide();
+      s.background = { color: 'F4F7FC' };
+      addHeader(s, '10/10', zh ? '次月行动计划 — 第二部分' : 'Next-Month Action Plan — Part II', zh ? '网站转化优化、用户体验改善与效果追踪方案' : 'Conversion rate optimisation, UX improvements, and performance tracking setup');
+      const cards2 = [
+        [zh ? '4. 结账流程优化（高优先级）' : '4. Checkout Flow Optimisation (High Priority)',
+          zh ? '在产品页与购物车页新增配送费用预估展示，消除结账阶段价格差异，预计降低放弃率 8–12pp。接入 Klarna 分期支付，针对 EUR 500+ 商品优先展示，预计提升高价商品转化率 15–20%。简化移动端结账至 3 步，目标将移动购买率从 1.6% 提升至 2.4%。'
+          : 'Add shipping cost estimation to product and cart pages to eliminate checkout price surprises. Expected: reduce abandonment by 8–12pp. Integrate Klarna for items above EUR 500; expected: 15–20% uplift on high-ticket items. Streamline mobile checkout from 5 to 3 steps; target mobile purchase rate: 1.6% to 2.4%.'],
+        [zh ? '5. 信任度与品牌内容建设' : '5. Trust and Brand Content Build',
+          zh ? '在产品页新增认证流程可视化模块（5 步图解），嵌入专业鉴定师证书与视频，强化"认证二手"核心差异化主张。与 Vogue Italia、GQ Italia、Corriere della Sera 时尚版洽谈合作内容，获取高质量外链提升 Domain Authority。'
+          : 'Add a 5-step visual authentication module to product pages with expert credentials and video to reinforce the certified pre-owned proposition. Initiate editorial partnership discussions with Vogue Italia, GQ Italia, and Corriere della Sera Fashion for high-quality backlinks to boost Domain Authority.'],
+        [zh ? '6. 数据监控与汇报机制' : '6. Data Monitoring and Reporting Framework',
+          zh ? '在 GA4 中建立专属报表视图：广告 ROAS 日报、漏斗各阶段周报（ATC / IC / Purchase）、关键词排名月报，配置关键指标异常自动告警。5 月末执行"运费前置展示"A/B 测试，以 IC→Purchase 转化率为主要指标，测试周期 3 周。'
+          : 'Build dedicated GA4 report views: daily ad ROAS, weekly funnel reports (ATC / IC / Purchase), monthly keyword rankings, with automated anomaly alerts. Run an A/B test in late May for upfront shipping cost display vs. current, with IC-to-Purchase CVR as the primary metric, over 3 weeks.'],
+      ];
+      cards2.forEach(([title, body], i) => {
+        const cy4 = 2.15 + i * 1.6;
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: cy4, w: 12.5, h: 1.45, fill: { color: WHITE }, line: { color: BORDER, width: 0.8 } });
+        s.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: cy4, w: 12.5, h: 0.07, fill: { color: BLUE } });
+        s.addText(title, { x: 0.6, y: cy4+0.15, w: 12.1, h: 0.32, fontSize: 12, color: NAVY, bold: true, fontFace: 'Georgia', margin: 0 });
+        s.addText(body, { x: 0.6, y: cy4+0.52, w: 12.1, h: 0.82, fontSize: 10, color: INK, margin: 0, valign: 'top' });
+      });
+      addFooter(s, 'Apr 2026 | Page 7 / 7');
+    }
+
+    await pres.writeFile({ fileName: 'BrandOn_SEO_Report_Apr2025.pptx' });
+    btn.textContent = currentLang === 'zh' ? '导出 PPT' : 'Export PPT';
+    btn.disabled = false;
+  } catch (err) {
+    console.error(err);
+    btn.textContent = currentLang === 'zh' ? '导出失败' : 'Export Failed';
+    btn.disabled = false;
+    setTimeout(() => {
+      btn.textContent = currentLang === 'zh' ? '导出 PPT' : 'Export PPT';
+    }, 3000);
+  }
+}
+</script>
+</body>
+</html>
