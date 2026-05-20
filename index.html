@@ -209,10 +209,10 @@
         <label class="field-label" id="lbl-report">Report</label>
         <select class="login-select" id="reportSelect">
           <option value="" disabled selected id="opt-select">-- Select report --</option>
-          <option value="/BrandonAprilReport.html">Brandon April Report</option>
-          <option value="/GP_IT-AV_Renovation_Report.html">GP IT-AV Renovation Report</option>
-          <option value="https://github.com/charles007K/BR-ON-VIN-Monthly-Report.git/CC.HTML">----</option>
-          <option value="https://github.com/charles007K/BR-ON-VIN-Monthly-Report.git/DD.HTML">----</option>
+          <option value="report/brandonaprilreport.html">Brand on April Report</option>
+          <option value="report/gpitavrenovationreport.html">GP IT&AV Renovation Report</option>
+          <option value="report/CC.html">---</option>
+          <option value="report/DD.html">---</option>
         </select>
       </div>
 
@@ -277,10 +277,56 @@
       this.style.opacity = pwVisible ? '1' : '0.4';
     });
 
-    document.getElementById('goBtn').addEventListener('click', function() {
-      var url = document.getElementById('reportSelect').value;
-      if (!url) { alert(strings[lang].errSelect); return; }
-      window.location.href = url;
+    document.getElementById('goBtn').addEventListener('click', async function() {
+      const select = document.getElementById('reportSelect');
+      const pwInput = document.getElementById('pwInput');
+      const reportUrl = select.value;
+      const password = pwInput.value.trim();
+
+      if (!reportUrl) {
+        alert(strings[lang].errSelect);
+        return;
+      }
+      if (!password) {
+        alert(lang === 'zh' ? '请输入密码' : 'Please enter password');
+        pwInput.focus();
+        return;
+      }
+
+      const btnText = document.getElementById('btn-text');
+      const originalBtnText = btnText.textContent;
+      btnText.textContent = lang === 'zh' ? '验证中...' : 'Verifying...';
+      this.disabled = true;
+
+      try {
+        const reportName = reportUrl.split('/').pop()
+                                   .replace(/\.html$/i, '')
+                                   .replace(/\.htm$/i, '')
+                                   .trim()
+                                   .toLowerCase();
+        console.log('提取的报告名称:', reportName);
+
+        const res = await fetch('/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ report: reportName, password: password })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          window.location.href = data.redirect;
+        } else {
+          const errorData = await res.json().catch(() => ({}));
+          alert(errorData.error || (lang === 'zh' ? '密码错误，请重试' : 'Wrong password, please try again'));
+          pwInput.value = '';
+          pwInput.focus();
+        }
+      } catch (err) {
+        alert(lang === 'zh' ? '网络错误，请稍后重试' : 'Network error, please try again');
+      } finally {
+        btnText.textContent = originalBtnText;
+        this.disabled = false;
+      }
     });
   </script>
 </body>
