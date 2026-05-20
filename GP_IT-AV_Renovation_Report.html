@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GP — IT & AV Infrastructure Renovation Report</title>
+<style>
+  :root {
+    --blue-dark:   #070f1e;
+    --blue-deep:   #0c1e3a;
+    --blue-mid:    #1a3a6b;
+    --blue-accent: #1e6abf;
+    --blue-bright: #2d8cf0;
+    --blue-light:  #5bb3ff;
+    --blue-pale:   #c8e4ff;
+    --white:       #ffffff;
+    --w90: rgba(255,255,255,0.90);
+    --w70: rgba(255,255,255,0.70);
+    --w30: rgba(255,255,255,0.30);
+    --w15: rgba(255,255,255,0.15);
+    --w08: rgba(255,255,255,0.08);
+    --w04: rgba(255,255,255,0.04);
+    --red:   #e05252;
+    --green: #4caf82;
+    --gold:  #f0b840;
+    --orange:#f07840;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:Arial,sans-serif;background:var(--blue-dark);color:var(--white);overflow-x:hidden;}
+
+  /* ── SLIDE ── */
+  .slide{
+    min-height:100vh;width:100%;
+    position:relative;display:flex;flex-direction:column;
+    justify-content:center;overflow:hidden;padding:56px 80px;
+  }
+  @media(max-width:800px){.slide{padding:40px 22px;}}
+
+  /* ── GRID BG ── */
+  .bg-grid{
+    position:absolute;inset:0;z-index:0;
+    background-image:
+      linear-gradient(rgba(45,140,240,0.06) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(45,140,240,0.06) 1px,transparent 1px);
+    background-size:52px 52px;
+  }
+  .bg-glow{
+    position:absolute;border-radius:50%;
+    filter:blur(130px);z-index:0;pointer-events:none;
+  }
+
+  /* ── NAV DOTS ── */
+  .nav-dots{
+    position:fixed;right:22px;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;gap:9px;z-index:999;
+  }
+  .nav-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--w30);cursor:pointer;
+    transition:all 0.3s;border:none;
+  }
+  .nav-dot.active,.nav-dot:hover{background:var(--blue-bright);transform:scale(1.6);}
+  @media(max-width:800px){.nav-dots{display:none;}}
+
+  /* ── PROGRESS ── */
+  .prog-bar{
+    position:fixed;top:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--blue-bright),var(--blue-light));
+    box-shadow:0 0 12px var(--blue-bright);z-index:1000;transition:width .4s ease;
+  }
+
+  /* ── SLIDE NUM ── */
+  .snum{
+    position:absolute;bottom:24px;right:32px;
+    font-size:10px;letter-spacing:2px;color:var(--w30);z-index:10;
+  }
+
+  /* ── CONTENT ── */
+  .content{position:relative;z-index:2;}
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow{
+    font-size:10px;letter-spacing:4px;text-transform:uppercase;
+    color:var(--blue-light);margin-bottom:14px;
+    opacity:0;animation:fadeUp .6s .1s forwards;
+  }
+  h1{font-size:clamp(34px,6vw,68px);font-weight:700;line-height:1.07;letter-spacing:-1px;}
+  h2{font-size:clamp(24px,4vw,48px);font-weight:700;line-height:1.1;margin-bottom:10px;}
+  h3{font-size:clamp(14px,2vw,20px);font-weight:700;color:var(--blue-light);margin-bottom:8px;}
+  p,li{font-size:clamp(12px,1.5vw,14px);line-height:1.75;color:var(--w70);}
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes expandW{from{width:0;}to{width:100%;}}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  @keyframes shimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+  .au{opacity:0;animation:fadeUp .7s ease forwards;}
+  .ai{opacity:0;animation:fadeIn .8s ease forwards;}
+  .d1{animation-delay:.12s;}.d2{animation-delay:.24s;}.d3{animation-delay:.36s;}
+  .d4{animation-delay:.48s;}.d5{animation-delay:.60s;}.d6{animation-delay:.72s;}
+
+  /* ── DIVIDER ── */
+  .div{height:2px;background:linear-gradient(90deg,var(--blue-bright),transparent);
+    margin:16px 0 24px;width:0;animation:expandW .8s .3s ease forwards;}
+
+  /* ── BADGES ── */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
+    border-radius:20px;font-size:10px;letter-spacing:1px;font-weight:700;text-transform:uppercase;}
+  .b-red{background:rgba(224,82,82,.18);color:var(--red);border:1px solid rgba(224,82,82,.4);}
+  .b-green{background:rgba(76,175,130,.18);color:var(--green);border:1px solid rgba(76,175,130,.4);}
+  .b-blue{background:rgba(45,140,240,.18);color:var(--blue-light);border:1px solid rgba(45,140,240,.4);}
+  .b-gold{background:rgba(240,184,64,.18);color:var(--gold);border:1px solid rgba(240,184,64,.4);}
+  .b-orange{background:rgba(240,120,64,.18);color:var(--orange);border:1px solid rgba(240,120,64,.4);}
+
+  /* ── CARDS ── */
+  .card{background:var(--w04);border:1px solid var(--w08);border-radius:14px;padding:22px;
+    backdrop-filter:blur(8px);transition:border-color .3s,transform .3s,box-shadow .3s;}
+  .card:hover{border-color:rgba(45,140,240,.45);transform:translateY(-3px);
+    box-shadow:0 10px 36px rgba(0,0,0,.3),0 0 16px rgba(45,140,240,.08);}
+  .c-red{border-left:3px solid var(--red);}
+  .c-blue{border-left:3px solid var(--blue-bright);}
+  .c-green{border-left:3px solid var(--green);}
+  .c-orange{border-left:3px solid var(--orange);}
+
+  /* ── GRIDS ── */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  @media(max-width:860px){.g2,.g3,.g4{grid-template-columns:1fr;}}
+
+  /* ── COMPARE ── */
+  .cmp{display:grid;grid-template-columns:1fr 40px 1fr;gap:0;align-items:stretch;}
+  .cmp-col{background:var(--w04);border:1px solid var(--w08);border-radius:14px;overflow:hidden;}
+  .cmp-col.before{border-left:3px solid var(--red);}
+  .cmp-col.after{border-left:3px solid var(--green);}
+  .cmp-hd{padding:13px 20px;font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+  .cmp-col.before .cmp-hd{color:var(--red);background:rgba(224,82,82,.08);}
+  .cmp-col.after  .cmp-hd{color:var(--green);background:rgba(76,175,130,.08);}
+  .cmp-body{padding:16px 20px;}
+  .cmp-body li{padding:5px 0;border-bottom:1px solid var(--w04);font-size:13px;list-style:none;}
+  .cmp-body li:last-child{border:none;}
+  .cmp-arr{display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue-light);}
+  @media(max-width:860px){.cmp{grid-template-columns:1fr;}.cmp-arr{transform:rotate(90deg);height:32px;}}
+
+  /* ── TABLE ── */
+  .tbl{width:100%;border-collapse:collapse;font-size:12px;}
+  .tbl th{background:rgba(29,106,191,.25);color:var(--blue-light);font-size:10px;
+    letter-spacing:2px;text-transform:uppercase;padding:10px 14px;text-align:left;
+    border-bottom:1px solid var(--w08);}
+  .tbl td{padding:10px 14px;border-bottom:1px solid var(--w04);color:var(--w70);}
+  .tbl tr:last-child td{border:none;}
+  .tbl tr:hover td{background:var(--w04);}
+  .tbl-total{background:rgba(45,140,240,.1)!important;}
+  .tbl-total td{color:var(--white)!important;border-top:1px solid rgba(45,140,240,.3)!important;font-weight:700;}
+  .price-col{color:var(--blue-light)!important;font-weight:700;}
+
+  /* ── NOTICES ── */
+  .notice{padding:13px 18px;border-radius:9px;font-size:12px;line-height:1.65;margin:12px 0;}
+  .n-warn{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);color:#ffaaaa;}
+  .n-info{background:rgba(45,140,240,.1);border:1px solid rgba(45,140,240,.3);color:var(--blue-pale);}
+  .n-ok{background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.3);color:#aaffcc;}
+  .n-gold{background:rgba(240,184,64,.1);border:1px solid rgba(240,184,64,.3);color:#ffe5a0;}
+
+  /* ── TIMELINE ── */
+  .tl{position:relative;padding-left:38px;}
+  .tl::before{content:'';position:absolute;left:11px;top:8px;bottom:8px;
+    width:2px;background:linear-gradient(to bottom,var(--blue-bright),transparent);}
+  .tl-item{position:relative;margin-bottom:24px;}
+  .tl-dot{position:absolute;left:-32px;top:4px;width:11px;height:11px;border-radius:50%;
+    background:var(--blue-bright);box-shadow:0 0 10px var(--blue-bright);border:2px solid var(--blue-dark);}
+  .tl-phase{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--blue-light);margin-bottom:3px;}
+  .tl-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px;}
+  .tl-desc{font-size:12px;color:var(--w70);}
+
+  /* ── PROGRESS BAR ── */
+  .prog-item{margin-bottom:14px;}
+  .prog-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;}
+  .prog-track{height:5px;border-radius:3px;background:var(--w08);overflow:hidden;}
+  .prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue-accent),var(--blue-light));
+    box-shadow:0 0 7px var(--blue-bright);width:0;animation:expandW 1s .5s ease forwards;}
+
+  /* ── STAT ── */
+  .stat-num{font-size:clamp(28px,4vw,48px);font-weight:700;line-height:1;
+    background:linear-gradient(135deg,var(--blue-bright),var(--blue-light));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--w70);margin-top:6px;}
+
+  /* ── EQUIPMENT VISUAL ── */
+  .rack-old{background:#0f1520;border-radius:10px;padding:18px;font-family:monospace;
+    font-size:11px;color:#4ade80;border:1px solid #374151;position:relative;overflow:hidden;}
+  .rack-unit{height:34px;background:#1c2333;border-radius:6px;margin-bottom:7px;
+    display:flex;align-items:center;padding:0 12px;gap:8px;
+    font-size:11px;border:1px solid #2d3748;}
+  .led{width:6px;height:6px;border-radius:50%;}
+  .led-r{background:#ef4444;box-shadow:0 0 4px #ef4444;animation:pulse 1s infinite;}
+  .led-g{background:#4ade80;box-shadow:0 0 4px #4ade80;}
+  .led-o{background:#f59e0b;box-shadow:0 0 4px #f59e0b;animation:pulse .8s infinite;}
+  .ports{display:flex;gap:2px;margin-left:auto;}
+  .port{width:11px;height:8px;background:#374151;border-radius:1px;border:1px solid #4b5563;}
+  .cables{position:absolute;right:6px;bottom:6px;display:flex;gap:2px;}
+  .cable{width:2px;border-radius:1px;}
+
+  .rack-new{background:linear-gradient(135deg,#0a1628,#1a3a6b);border-radius:10px;
+    border:1px solid rgba(45,140,240,.3);padding:16px;font-family:monospace;
+    font-size:9px;color:var(--blue-light);position:relative;overflow:hidden;}
+  .rack-new::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+    animation:shimmer 3s infinite;}
+  .new-unit{height:24px;border-radius:5px;background:rgba(45,140,240,.08);
+    border:1px solid rgba(45,140,240,.2);margin-bottom:3px;
+    display:flex;align-items:center;padding:0 9px;gap:7px;}
+  .new-ports{display:flex;gap:2px;margin-left:auto;}
+  .new-port{width:8px;height:5px;background:rgba(45,140,240,.3);
+    border-radius:1px;border:1px solid rgba(45,140,240,.5);}
+
+  /* ── COVER CIRCUITS ── */
+  .circuits{position:absolute;inset:0;z-index:1;opacity:.1;}
+
+  /* ── SECTION LABEL ── */
+  .slabel{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--blue-light);margin-bottom:8px;}
+
+  /* ── PRIORITY INDICATOR ── */
+  .prio{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1px;}
+  .prio-dot{width:8px;height:8px;border-radius:50%;animation:blink 1.2s infinite;}
+  .prio-critical .prio-dot{background:var(--red);box-shadow:0 0 8px var(--red);}
+  .prio-high     .prio-dot{background:var(--orange);box-shadow:0 0 8px var(--orange);}
+  .prio-medium   .prio-dot{background:var(--gold);box-shadow:0 0 8px var(--gold);}
+
+  /* ── NAS DIAGRAM ── */
+  .nas-box{background:linear-gradient(135deg,#0a1628,#1a3a6b);border-radius:10px;
+    border:2px solid rgba(45,140,240,.4);padding:18px;text-align:center;
+    box-shadow:0 0 24px rgba(45,140,240,.15);}
+  .nas-drives{display:flex;gap:8px;justify-content:center;margin:12px 0;}
+  .nas-drive{width:36px;height:54px;border-radius:5px;background:#0f1a2e;
+    border:1px solid rgba(45,140,240,.4);display:flex;align-items:center;
+    justify-content:center;flex-direction:column;gap:4px;}
+  .nas-drive-fill{width:20px;height:6px;border-radius:2px;background:var(--blue-bright);}
+
+  /* ── DISK USAGE RING ── */
+  .disk-ring{position:relative;width:80px;height:80px;margin:0 auto 8px;}
+  .disk-ring svg{transform:rotate(-90deg);}
+  .disk-ring-label{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;flex-direction:column;font-size:14px;font-weight:700;}
+
+  /* AP VISUAL */
+  .ap-device{background:#111827;border-radius:12px;padding:16px;
+    border:1px solid #374151;text-align:center;}
+  .ap-new{background:linear-gradient(135deg,#0a1628,#1a3a6b);border-radius:12px;
+    padding:16px;border:1px solid rgba(45,140,240,.4);text-align:center;}
+  .wifi-bars{display:flex;align-items:flex-end;gap:3px;height:32px;justify-content:center;margin-bottom:8px;}
+  .wb{width:7px;border-radius:2px 2px 0 0;}
+  .wb-old{background:#ef4444;}
+  .wb-new{background:#4ade80;box-shadow:0 0 5px #4ade80;}
+
+  /* QUOTE */
+  .quote{border-left:3px solid var(--blue-bright);padding:14px 20px;
+    background:var(--w04);border-radius:0 10px 10px 0;margin:16px 0;}
+  .quote p{color:var(--w90);font-style:italic;font-size:14px;}
+
+
+  /* ── PROFESSIONAL / PRINT / PROTECTION ADDITIONS ── */
+  body{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+  }
+  img{pointer-events:none;}
+  .price-note{display:inline-block;margin-top:4px;color:var(--w70);font-size:11px;line-height:1.5;}
+  .approval-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+  .signature-box{border:1px solid var(--w15);border-radius:12px;padding:16px;background:var(--w04);min-height:86px;}
+  .signature-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue-light);margin-bottom:26px;}
+  .signature-line{height:1px;background:var(--w30);}
+  @media(max-width:860px){.approval-grid{grid-template-columns:1fr;}}
+
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    html, body { width:100%; background:#060e1c !important; color:white !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .slide { min-height:auto; height:auto; page-break-after:auto; break-after:auto; overflow:visible; }
+    .card, .cmp-col, .notice, table { break-inside:avoid; page-break-inside:avoid; }
+    .nav-dots, .prog-bar { display:none !important; }
+    * { animation:none !important; transition:none !important; }
+  }
+
+
+
+  /* ── USER REQUESTED REFINEMENTS ── */
+  .snum{display:none!important;}
+
+  /* Align status badges at the bottom of issue cards */
+  .g3 .card{display:flex;flex-direction:column;}
+  .g3 .card > p{flex:1;}
+  .g3 .card > div:last-child{margin-top:auto!important;}
+
+  /* Improve IT rack visual alignment and readability */
+  .rack-new{min-height:unset!important;display:flex;flex-direction:column;gap:6px;padding:22px!important;}
+  .rack-new .new-unit{height:30px!important;min-height:30px;align-items:center!important;}
+  .rack-new .new-unit span{font-size:11px!important;line-height:1.3!important;}
+  .rack-new > div:first-child{font-size:11px!important;line-height:1.4!important;}
+  .rack-new > div[style*="margin-top:12px"]{font-size:11px!important;line-height:1.4!important;}
+  .new-port{width:10px!important;height:7px!important;}
+
+  .report-credit{
+    position:relative;z-index:2;text-align:center;color:var(--w70);font-size:12px;
+    letter-spacing:1px;padding:22px 16px;border-top:1px solid var(--w08);
+    background:rgba(7,15,30,.92);
+  }
+
+  @media print {
+    .slide{page-break-after:auto!important;break-after:auto!important;min-height:auto!important;}
+    .nav-dots,.prog-bar,.snum{display:none!important;}
+    *{animation:none!important;transition:none!important;}
+    .card,.notice,.cmp-col,table{break-inside:avoid;page-break-inside:avoid;}
+  }
+
+</style>
+</head>
+<body>
+
+<div class="nav-dots" id="navDots"></div>
+<div class="prog-bar" id="progBar"></div>
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 01 · COVER
+══════════════════════════════════════════════ -->
+<section class="slide" id="s1" style="background:linear-gradient(135deg,#040c1a 0%,#0c1e3a 60%,#070f1e 100%);">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:580px;height:580px;background:rgba(29,106,191,.22);right:-80px;top:-80px;"></div>
+<div class="bg-glow" style="width:360px;height:360px;background:rgba(91,179,255,.08);left:-60px;bottom:-60px;"></div>
+
+<svg class="circuits" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2d8cf0" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#2d8cf0" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#2d8cf0" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M80,200 L380,200 L380,380 L680,380" stroke="url(#lg1)" stroke-width="1.5" fill="none"/>
+  <path d="M180,100 L180,280 L480,280 L480,560" stroke="url(#lg1)" stroke-width="1.5" fill="none"/>
+  <path d="M0,480 L260,480 L260,150 L560,150" stroke="url(#lg1)" stroke-width="1.5" fill="none"/>
+  <path d="M1400,280 L1080,280 L1080,480 L780,480" stroke="url(#lg1)" stroke-width="1.5" fill="none"/>
+  <circle cx="380" cy="200" r="4" fill="#2d8cf0"/>
+  <circle cx="380" cy="380" r="4" fill="#2d8cf0"/>
+  <circle cx="180" cy="280" r="4" fill="#2d8cf0"/>
+  <circle cx="480" cy="280" r="4" fill="#2d8cf0"/>
+  <circle cx="260" cy="480" r="4" fill="#2d8cf0"/>
+  <circle cx="1080" cy="280" r="4" fill="#2d8cf0"/>
+  <circle cx="1080" cy="480" r="4" fill="#2d8cf0"/>
+</svg>
+
+<div class="content" style="max-width:820px;">
+  <div class="eyebrow">GP · Infrastructure Assessment Report · 2026</div>
+  <h1 class="au d1">IT &amp; AV<br>Infrastructure<br>Renovation Plan</h1>
+  <div class="div"></div>
+  <p class="au d3" style="max-width:580px;font-size:15px;color:var(--w70);">
+    A full-scope review of GP's current IT network and AV systems — identifying critical risks,
+    outlining remediation priorities, and providing a clear path to a modern, reliable, and
+    secure workplace infrastructure.
+  </p>
+  <div style="display:flex;gap:10px;margin-top:30px;flex-wrap:wrap;" class="au d4">
+    <span class="badge b-red">Critical Data Risk — Critical</span>
+    <span class="badge b-orange">Warning Network — Aging</span>
+    <span class="badge b-gold">Wireless Wi-Fi — Single AP</span>
+    <span class="badge b-blue">AV AV — Obsolete</span>
+  </div>
+  <div style="display:flex;gap:36px;margin-top:44px;flex-wrap:wrap;" class="au d5">
+    <div><div class="stat-num">2</div><div class="stat-label">Sections: IT + AV</div></div>
+    <div style="width:1px;background:var(--w15);"></div>
+    <div><div class="stat-num">6</div><div class="stat-label">Problem Areas</div></div>
+    <div style="width:1px;background:var(--w15);"></div>
+    <div><div class="stat-num">97%</div><div class="stat-label" style="color:var(--red);">Disk Usage — Critical</div></div>
+  </div>
+  <div class="au d6" style="margin-top:24px;font-size:12px;color:var(--w70);letter-spacing:1px;">Assessment Date: May 2026</div>
+</div>
+</section>
+
+
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 02 · EXECUTIVE SUMMARY
+══════════════════════════════════════════════ -->
+<section class="slide" id="executive-summary" style="background:linear-gradient(160deg,#070f1e 0%,#0c1e3a 100%);">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:520px;height:520px;background:rgba(45,140,240,.10);right:-80px;top:-80px;"></div>
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">Management View</div>
+  <h2 class="au d1">Executive Summary</h2>
+  <div class="div"></div>
+
+  <div class="g4 au d2" style="margin-bottom:24px;">
+    <div class="card c-red" style="text-align:center;"><div class="stat-num">97%</div><div class="stat-label">Disk Usage</div></div>
+    <div class="card c-orange" style="text-align:center;"><div class="stat-num">15+</div><div class="stat-label">Year Old UPS</div></div>
+    <div class="card c-orange" style="text-align:center;"><div class="stat-num">1</div><div class="stat-label">Access Point Only</div></div>
+    <div class="card c-red" style="text-align:center;"><div class="stat-num">0</div><div class="stat-label">Backup System</div></div>
+  </div>
+
+  <div class="g2" style="gap:22px;">
+    <div class="card c-red au d3">
+      <span class="badge b-red">Immediate Risk</span>
+      <h3 style="color:#ff9090;margin-top:12px;">Data Protection Requires Immediate Action</h3>
+      <p>The existing HP server is running at 97% capacity with a degraded RAID 1 array and no confirmed backup system. The first priority is to create an external backup and migrate file storage to a dedicated NAS platform.</p>
+    </div>
+    <div class="card c-orange au d4">
+      <span class="badge b-orange">Infrastructure Problems</span>
+      <h3 style="color:#ffb090;margin-top:12px;">Network, Wi-Fi and AV Systems Are Legacy</h3>
+      <p>The current environment relies on legacy Cat5 cabling, poor rack organization, a single obsolete wireless access point, and VGA-based AV connectivity that no longer supports modern meeting requirements.</p>
+    </div>
+  </div>
+
+  <div class="g2 au d5" style="gap:22px;margin-top:22px;">
+    <div class="card c-blue">
+      <h3>Recommended Priorities</h3>
+      <ol style="padding-left:20px;margin-top:8px;">
+        <li>Emergency backup and NAS deployment</li>
+        <li>Rack clean-up, labeling and Cat6 migration</li>
+        <li>Wi-Fi 6 access point replacement</li>
+        <li>Show Room AV modernization</li>
+      </ol>
+    </div>
+    <div class="card c-green">
+      <h3 style="color:var(--green);">Expected Business Impact</h3>
+      <p>Reduced downtime, improved meeting reliability, stronger data resilience, easier IT maintenance, better wireless coverage and a more scalable workplace infrastructure.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 03 · IMPLEMENTATION TIMELINE
+══════════════════════════════════════════════ -->
+<section class="slide" id="implementation-timeline" style="background:#060e1c;">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:460px;height:460px;background:rgba(76,175,130,.07);right:0;bottom:0;"></div>
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">Project Delivery Plan</div>
+  <h2 class="au d1">Implementation Timeline</h2>
+  <div class="div"></div>
+
+  <div class="tl au d2" style="max-width:980px;">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-phase">Phase 1 · Immediate</div>
+      <div class="tl-title">Emergency Data Protection</div>
+      <div class="tl-desc">External backup, NAS procurement, RAID migration and scheduled backup configuration. Estimated duration: 1–2 weeks.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-phase">Phase 2 · Infrastructure</div>
+      <div class="tl-title">Rack Infrastructure</div>
+      <div class="tl-desc">PDU installation, patch panel labeling, Cat6 patching, cable managers and cabinet documentation. Estimated duration: 1 week after supplier survey.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-phase">Phase 3 · Cabling</div>
+      <div class="tl-title">Office Horizontal Cabling</div>
+      <div class="tl-desc">Cat6 runs, new face plates, trunking, port mapping and removal of temporary splitters. Estimated duration: supplier quotation required.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-phase">Phase 4 · Wireless</div>
+      <div class="tl-title">Wi-Fi 6 Upgrade</div>
+      <div class="tl-desc">Deploy three access points, optimize RF placement, configure security and roaming. Estimated duration: 1–2 days after cabling readiness.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-phase">Phase 5 · Meeting Room</div>
+      <div class="tl-title">AV Renovation</div>
+      <div class="tl-desc">Replace VGA projection, add HDMI / USB-C connectivity, deploy DSP-based audio and validate user workflow. Estimated duration: supplier quotation required.</div>
+    </div>
+  </div>
+
+  <div class="notice n-info au d4" style="margin-top:18px;">
+    Dependency note: Phase 1 should be approved first because it protects business data. Rack, cabling and Wi-Fi work should then be coordinated to avoid duplicated labor.
+  </div>
+</div>
+</section>
+<!-- ══════════════════════════════════════════════
+     SLIDE 04 · ISSUES OVERVIEW
+══════════════════════════════════════════════ -->
+<section class="slide" id="s2" style="background:linear-gradient(160deg,#070f1e 0%,#0c1e3a 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">Summary of Findings</div>
+  <h2 class="au d1">GP Current Infrastructure — Overview of Issues</h2>
+  <div class="div"></div>
+
+  <div class="g3" style="margin-top:8px;">
+    <div class="card c-red au d2">
+      <div class="prio prio-critical" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--red);">CRITICAL PRIORITY</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Storage</div>
+      <h3 style="color:#ff9090;">Data Storage</h3>
+      <p>HP server at 97% capacity with one failed drive in RAID 1 array. No backup. Single point of failure — there is a high risk of data loss without immediate action.</p>
+      <div style="margin-top:14px;"><span class="badge b-red">Immediate Action</span></div>
+    </div>
+
+    <div class="card c-orange au d3">
+      <div class="prio prio-high" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--orange);">HIGH PRIORITY</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Rack</div>
+      <h3 style="color:#ffb090;">IT Rack & Cabling</h3>
+      <p>42U rack with no PDU, no cable manager, no labels. All runs are Cat5. Patch panel and cables are entirely unlabeled. No cable routing structure.</p>
+      <div style="margin-top:14px;"><span class="badge b-orange">Plan Required</span></div>
+    </div>
+
+    <div class="card c-orange au d4">
+      <div class="prio prio-high" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--orange);">HIGH PRIORITY</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Wireless</div>
+      <h3 style="color:#ffb090;">Wi-Fi System</h3>
+      <p>Single Cisco AP from 2006, mounted on top of the rack. No management capability. Limited coverage. Frequent drops and packet loss in daily use.</p>
+      <div style="margin-top:14px;"><span class="badge b-orange">Replace Required</span></div>
+    </div>
+
+    <div class="card au d3">
+      <div class="prio prio-medium" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--gold);">MEDIUM PRIORITY</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Power</div>
+      <h3>Power (UPS)</h3>
+      <p>APC UPS from approx. 2010 — over 15 years in service. Battery degraded significantly. Only ~10 min backup. Replacement recommended with 1-hour target runtime.</p>
+      <div style="margin-top:14px;"><span class="badge b-gold">Scheduled</span></div>
+    </div>
+
+    <div class="card c-red au d4">
+      <div class="prio prio-critical" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--red);">AV — CRITICAL</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Display</div>
+      <h3 style="color:#ff9090;">Show Room Display</h3>
+      <p>VGA signal only. Old projector with motion blur on dense text. Modern laptops have no VGA port. Every presentation requires a specific machine or adapter.</p>
+      <div style="margin-top:14px;"><span class="badge b-red">Replace</span></div>
+    </div>
+
+    <div class="card c-red au d5">
+      <div class="prio prio-critical" style="margin-bottom:10px;">
+        <div class="prio-dot"></div><span style="color:var(--red);">AV — CRITICAL</span>
+      </div>
+      <div style="font-size:28px;margin-bottom:10px;">Audio</div>
+      <h3 style="color:#ff9090;">Audio System</h3>
+      <p>Analog active speakers sharing power with other devices. Severe 60Hz ground loop hum. No noise cancellation. Analog mixing console. Poor meeting audio quality.</p>
+      <div style="margin-top:14px;"><span class="badge b-red">Replace</span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 03 · IT — DATA STORAGE CURRENT STATE
+══════════════════════════════════════════════ -->
+<section class="slide" id="s3" style="background:#060e1c;">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:500px;height:400px;background:rgba(224,82,82,.07);right:0;top:0;"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Data Storage — Current State</div>
+  <h2 class="au d1">HP Server — Critical Risk Assessment</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <!-- Left: disk usage visual -->
+    <div class="au d2">
+      <div class="card c-red" style="padding:24px;margin-bottom:16px;">
+        <h3 style="color:var(--red);margin-bottom:18px;">Storage Status Current Storage Status</h3>
+
+        <!-- disk usage ring -->
+        <div style="display:flex;align-items:center;gap:24px;margin-bottom:20px;">
+          <div class="disk-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+              <circle cx="40" cy="40" r="32" fill="none" stroke="#ef4444" stroke-width="10"
+                stroke-dasharray="201.06" stroke-dashoffset="6.03" stroke-linecap="round"/>
+            </svg>
+            <div class="disk-ring-label">
+              <span style="font-size:18px;font-weight:700;color:var(--red);">97%</span>
+              <span style="font-size:9px;color:var(--w70);">USED</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:13px;color:var(--w70);">Total Capacity</div>
+            <div style="font-size:22px;font-weight:700;color:var(--white);">1 TB RAID 1</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px;">~30 GB free only</div>
+          </div>
+        </div>
+
+        <!-- drives status -->
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <div style="flex:1;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
+            border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;">Drive</div>
+            <div style="font-size:11px;color:var(--w70);margin-top:4px;">Drive 1</div>
+            <div class="badge b-red" style="margin-top:6px;justify-content:center;">Warning FAILED</div>
+          </div>
+          <div style="flex:1;background:rgba(240,184,64,.08);border:1px solid rgba(240,184,64,.3);
+            border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:22px;">Drive</div>
+            <div style="font-size:11px;color:var(--w70);margin-top:4px;">Drive 2</div>
+            <div class="badge b-gold" style="margin-top:6px;justify-content:center;">Warning Last Good</div>
+          </div>
+        </div>
+
+        <div class="notice n-warn">
+          Critical <strong>CRITICAL:</strong> RAID 1 requires 2 healthy drives. One has already failed. If the remaining drive fails, <strong>there is a high risk of complete data loss if the remaining drive fails</strong>. No backup exists.
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px;">
+        <h3 style="margin-bottom:10px;">Server Details</h3>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">Make</span><span>HP Server (model TBC)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);gap:14px;">
+            <span style="color:var(--w70);">Processor Information</span><span style="text-align:right;">Intel(R) Pentium(R) CPU G6950 @ 2.80GHz, 2 cores</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">Processor Generation</span><span style="color:var(--orange);">2010-era product</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">RAID Configuration</span><span>RAID 1 (Mirror)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">Total Capacity</span><span>1 TB</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">Usage</span><span style="color:var(--red);">~970 GB (97%)</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;padding-bottom:6px;border-bottom:1px solid var(--w04);">
+            <span style="color:var(--w70);">Role</span><span>File Storage Only</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--w70);">Backup</span><span style="color:var(--red);">None</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: recommendations -->
+    <div class="au d3">
+      <div class="notice n-warn" style="margin-bottom:16px;">
+        Power <strong>Immediate Step:</strong> Back up all current data to an external hard drive NOW, before the second drive fails.
+      </div>
+
+      <h3 style="margin-bottom:14px;color:var(--green);"> Recommended Solution: NAS Deployment</h3>
+
+      <!-- NAS visual -->
+      <div class="nas-box" style="margin-bottom:16px;">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--blue-light);margin-bottom:12px;">
+          SYNOLOGY DS225+ · 2-BAY NAS
+        </div>
+        <div class="nas-drives">
+          <div class="nas-drive">
+            <div class="nas-drive-fill"></div>
+            <div class="nas-drive-fill"></div>
+            <div class="nas-drive-fill" style="opacity:.6;"></div>
+            <div style="font-size:8px;color:var(--blue-light);margin-top:4px;">4TB</div>
+          </div>
+          <div class="nas-drive">
+            <div class="nas-drive-fill" style="background:var(--green);"></div>
+            <div class="nas-drive-fill" style="background:var(--green);"></div>
+            <div class="nas-drive-fill" style="background:var(--green);opacity:.6;"></div>
+            <div style="font-size:8px;color:var(--green);margin-top:4px;">4TB</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--w70);">RAID 1 · 4TB usable · Auto-backup enabled</div>
+        <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;">
+          <span class="badge b-green">RAID 1 Protected</span>
+          <span class="badge b-blue">Remote Access</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">Dual-drive RAID 1 redundancy</strong><br>
+            <span style="font-size:12px;">If one drive fails, data is automatically preserved on the second. No manual intervention required.</span></div>
+        </div>
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">Automated scheduled backup</strong><br>
+            <span style="font-size:12px;">Synology DSM supports versioned snapshots, offsite cloud sync (OneDrive, Google Drive) and scheduled local backup.</span></div>
+        </div>
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">Remote access from any device</strong><br>
+            <span style="font-size:12px;">Staff can access files via browser, Windows, Mac, iOS or Android — without VPN complexity.</span></div>
+        </div>
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">4 TB recommended usable capacity</strong><br>
+            <span style="font-size:12px;">2× 4TB CMR NAS drives provide approximately 4TB usable RAID 1 capacity, stronger reliability and better growth headroom than entry-level 2TB drives.</span></div>
+        </div>
+      </div>
+
+      <!-- price -->
+      <div class="card c-blue" style="margin-top:14px;padding:16px;">
+        <h3 style="margin-bottom:10px;">Estimated Cost</h3>
+        <div class="notice n-info" style="margin:0;">
+          Synology DS225+ (2-bay, diskless): <strong>≈ €390 EUR</strong><br>
+          + 2× 4TB WD Red Plus CMR NAS HDD: <strong>≈ €480 EUR each</strong><br>
+          + 1× 2TB External HDD for immediate backup: <strong>≈ €100 EUR</strong><br>
+          <strong style="color:var(--white);">Total Estimate: ≈ €970 EUR</strong><br><span class="price-note">Final pricing subject to supplier quotation. Prices exclude VAT, shipping, delivery and installation unless otherwise stated.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 03B · IT — SWITCH & FIREWALL CURRENT STATE
+══════════════════════════════════════════════ -->
+<section class="slide" id="s3b" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:460px;height:420px;background:rgba(240,120,64,.08);right:-40px;top:60px;"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Network Core Devices — Current State</div>
+  <h2 class="au d1">Switch &amp; Firewall — Legacy Hardware and Expired Security Services</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;align-items:stretch;">
+    <div class="card c-orange au d2" style="padding:24px;">
+      <div class="prio prio-high" style="margin-bottom:14px;">
+        <div class="prio-dot"></div><span style="color:var(--orange);">HIGH PRIORITY</span>
+      </div>
+      <h3 style="font-size:24px;color:var(--orange);margin-bottom:12px;">HP 2610-24 Switch</h3>
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <table class="tbl">
+          <tbody>
+            <tr><td>Lifecycle Status</td><td style="color:var(--orange);font-weight:700;">Discontinued in 2012</td></tr>
+            <tr><td>Port Speed</td><td>10/100 Mbps access ports only</td></tr>
+            <tr><td>Current Impact</td><td>Slow access speed and limited capacity for modern office traffic</td></tr>
+            <tr><td>Risk Level</td><td style="color:var(--orange);font-weight:700;">Performance bottleneck</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="notice n-warn" style="margin-bottom:14px;">
+        The existing switch is no longer suitable for the current network requirement. Its 100 Mbps limitation can restrict file access, NAS performance, Wi-Fi uplink speed and general office productivity.
+      </div>
+      <div class="notice n-info" style="margin:0;">
+        <strong>Recommendation:</strong> Replace with a Cisco Gigabit switch platform, such as Cisco Catalyst 1000 series or equivalent, to provide 1000 Mbps access ports and better compatibility with the proposed network upgrade.
+      </div>
+    </div>
+
+    <div class="card c-red au d3" style="padding:24px;">
+      <div class="prio prio-critical" style="margin-bottom:14px;">
+        <div class="prio-dot"></div><span style="color:var(--red);">CRITICAL SECURITY GAP</span>
+      </div>
+      <h3 style="font-size:24px;color:var(--red);margin-bottom:12px;">Zyxel USG210 Firewall</h3>
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <table class="tbl">
+          <tbody>
+            <tr><td>Lifecycle Status</td><td style="color:var(--red);font-weight:700;">Discontinued / End of Life</td></tr>
+            <tr><td>Security License</td><td style="color:var(--red);font-weight:700;">Expired</td></tr>
+            <tr><td>Main Functions</td><td>Antivirus, anti-spam, intrusion detection, application control and web filtering</td></tr>
+            <tr><td>Current Value</td><td style="color:var(--red);font-weight:700;">Security services effectively inactive</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="notice n-warn" style="margin-bottom:14px;">
+        The firewall license has expired. In practical terms, the security features it was originally designed to provide are not active. The device is currently consuming power without delivering meaningful security protection.
+      </div>
+      <div class="notice n-info" style="margin:0;">
+        <strong>Recommendation:</strong> Replace with a modern firewall service such as Cisco Meraki MX67 / MX68 or equivalent, including active security licensing, cloud management and ongoing security updates.
+      </div>
+    </div>
+  </div>
+
+  <div class="card c-blue au d4" style="margin-top:22px;padding:22px;">
+    <h3 style="font-size:20px;margin-bottom:14px;color:var(--blue-light);">Recommended Functional Improvements</h3>
+    <div class="g3" style="gap:14px;">
+      <div class="notice n-info" style="margin:0;">Gigabit switching for faster internal access, NAS traffic and Wi-Fi uplinks.</div>
+      <div class="notice n-info" style="margin:0;">Port security, better VLAN support and improved access control for office devices.</div>
+      <div class="notice n-info" style="margin:0;">Visual management interface for easier monitoring, troubleshooting and administration.</div>
+      <div class="notice n-info" style="margin:0;">Stronger authentication protocol support for a more modern security baseline.</div>
+      <div class="notice n-info" style="margin:0;">Active firewall subscription for malware protection, intrusion prevention and web filtering.</div>
+      <div class="notice n-info" style="margin:0;">Centralized reporting, alerts and policy management through a modern cloud platform.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 04 · IT — RACK CURRENT STATE
+══════════════════════════════════════════════ -->
+<section class="slide" id="s4" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Rack Infrastructure — Current State</div>
+  <h2 class="au d1">42U Network Cabinet — As-Found Conditions</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <div class="au d2">
+      <div class="rack-old" style="min-height:200px;">
+        <div style="color:#9ca3af;margin-bottom:10px;font-size:9px;letter-spacing:1px;">
+          IT RACK · AS-FOUND · NO PDU · NO CABLE MGMT
+        </div>
+        <div class="rack-unit">
+          <div class="led led-o"></div>
+          <span style="color:#9ca3af;">ROUTER — UNLABELED</span>
+          <div class="ports"><div class="port"></div><div class="port"></div></div>
+        </div>
+        <div class="rack-unit">
+          <div class="led led-r"></div>
+          <span style="color:#9ca3af;">SWITCH — CAT5 — NO LABEL</span>
+          <div class="ports"><div class="port"></div><div class="port"></div><div class="port"></div></div>
+        </div>
+        <div class="rack-unit">
+          <div class="led led-o"></div>
+          <span style="color:#9ca3af;">PATCH PANEL — UNLABELED PORTS</span>
+        </div>
+        <div class="rack-unit">
+          <div class="led led-o"></div>
+          <span style="color:#9ca3af;">FIBER PATCH PANEL</span>
+        </div>
+        <div class="rack-unit">
+          <div class="led led-r"></div>
+          <span style="color:#9ca3af;">WIFI AP (ON TOP OF RACK)</span>
+        </div>
+        <div class="rack-unit">
+          <span style="color:#6b7280;">—  NO PDU  —</span>
+        </div>
+        <div class="cables">
+          <div class="cable" style="height:70px;background:linear-gradient(#f59e0b,#374151);transform:rotate(18deg);"></div>
+          <div class="cable" style="height:55px;background:linear-gradient(#3b82f6,#374151);transform:rotate(-8deg);"></div>
+          <div class="cable" style="height:80px;background:linear-gradient(#ef4444,#374151);transform:rotate(26deg);"></div>
+          <div class="cable" style="height:45px;background:linear-gradient(#10b981,#374151);transform:rotate(-16deg);"></div>
+          <div class="cable" style="height:65px;background:linear-gradient(#f59e0b,#374151);transform:rotate(6deg);"></div>
+        </div>
+        <div style="margin-top:14px;font-size:9px;color:#ef4444;">
+          Warning NO PDU · NO CABLE RINGS · NO LABELS · CAT5 ONLY · WIFI AP PLACED ON TOP
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--w30);margin-top:8px;letter-spacing:1px;">
+        CURRENT STATE — UNMANAGED CABINET
+      </div>
+    </div>
+
+    <div class="au d3">
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        <div class="card" style="padding:14px;display:flex;gap:10px;">
+          <span style="color:var(--red);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">No PDU (Power Distribution Unit)</strong><br>
+            <span style="font-size:12px;">Devices plugged directly into unswitched strips. No per-port power control, no surge protection per device, no remote management of power.</span></div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;gap:10px;">
+          <span style="color:var(--red);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">No Cable Managers (horizontal or vertical)</strong><br>
+            <span style="font-size:12px;">All patch cables bundled loosely with zip ties. Bend radius violations cause signal loss. Impossible to add or remove a cable without disrupting others.</span></div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;gap:10px;">
+          <span style="color:var(--red);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">No Port or Cable Labels</strong><br>
+            <span style="font-size:12px;">Patch panel ports and all cable ends are completely unlabeled. Fault isolation requires physical tracing of every run — causing hours of downtime.</span></div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;gap:10px;">
+          <span style="color:var(--red);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">Cat5 Cabling — Obsolete Standard</strong><br>
+            <span style="font-size:12px;">Legacy Cat5 infrastructure may limit stable Gigabit Ethernet performance and is not recommended for modern network deployments. Cat6 is recommended for PoE+, improved signal integrity and future scalability.</span></div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;gap:10px;">
+          <span style="color:var(--orange);font-size:16px;flex-shrink:0;"></span>
+          <div><strong style="font-size:13px;">Wi-Fi AP Placed on Top of Rack</strong><br>
+            <span style="font-size:12px;">A 2006 Cisco AP sitting on top of a metal cabinet is the worst possible antenna placement. The cabinet body blocks and reflects RF signal severely.</span></div>
+        </div>
+
+        <div class="notice n-info" style="margin-top:6px;">
+          Recommendation: <strong>Recommendation:</strong> Full rack re-cabling using Cat6 with horizontal + vertical cable managers, PDU, labeled patch panel and all cable ends. Approx. <strong>50 × 2m patch cables</strong> required.
+          <br><br>Pricing for this section to be obtained via <strong>IT Supplier Full Quote</strong>.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 05 · IT — RACK AFTER
+══════════════════════════════════════════════ -->
+<section class="slide" id="s5" style="background:#060e1c;">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:400px;height:400px;background:rgba(76,175,130,.07);right:0;bottom:0;"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Rack Infrastructure — Recommended</div>
+  <h2 class="au d1">Cabinet Upgrade — Cat6 + Structured Cabling</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <div class="au d2">
+      <div class="rack-new" style="min-height:220px;padding:18px;">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--blue-light);margin-bottom:12px;">
+          IT RACK · AFTER RENOVATION · FULLY MANAGED
+        </div>
+        <div class="new-unit">
+          <div class="led led-g"></div>
+          <span style="font-size:9px;color:var(--w70);">PDU · METERED · PER-PORT SWITCHED</span>
+        </div>
+        <div style="height:5px;background:rgba(45,140,240,.08);border-radius:3px;margin:3px 0 6px;
+          display:flex;align-items:center;padding:0 8px;gap:4px;">
+          <div style="width:18px;height:2px;border-radius:1px;background:rgba(45,140,240,.6);"></div>
+          <div style="width:28px;height:2px;border-radius:1px;background:rgba(45,140,240,.4);"></div>
+          <div style="width:22px;height:2px;border-radius:1px;background:rgba(45,140,240,.5);"></div>
+          <div style="width:14px;height:2px;border-radius:1px;background:rgba(45,140,240,.4);"></div>
+        </div>
+        <div class="new-unit">
+          <div class="led led-g"></div>
+          <span style="font-size:9px;color:var(--w70);">48P CAT6 PATCH PANEL — ALL PORTS LABELED</span>
+          <div class="new-ports">
+            <div class="new-port"></div><div class="new-port"></div><div class="new-port"></div>
+            <div class="new-port"></div><div class="new-port"></div><div class="new-port"></div>
+          </div>
+        </div>
+        <div class="new-unit" style="height:16px;background:rgba(45,140,240,.04);">
+          <span style="font-size:8px;color:rgba(91,179,255,.5);letter-spacing:1px;">HORIZONTAL CABLE MANAGER 1U</span>
+        </div>
+        <div class="new-unit">
+          <div class="led led-g"></div>
+          <span style="font-size:9px;color:var(--w70);">SWITCH — 24P PoE+ — CAT6 RUNS</span>
+          <div class="new-ports">
+            <div class="new-port"></div><div class="new-port"></div><div class="new-port"></div>
+            <div class="new-port"></div><div class="new-port"></div>
+          </div>
+        </div>
+        <div class="new-unit" style="height:16px;background:rgba(45,140,240,.04);">
+          <span style="font-size:8px;color:rgba(91,179,255,.5);letter-spacing:1px;">HORIZONTAL CABLE MANAGER 1U</span>
+        </div>
+        <div class="new-unit">
+          <div class="led led-g"></div>
+          <span style="font-size:9px;color:var(--w70);">ROUTER / FIREWALL</span>
+        </div>
+        <div class="new-unit">
+          <div class="led led-g"></div>
+          <span style="font-size:9px;color:var(--w70);">FIBER PATCH PANEL — LABELED</span>
+        </div>
+        <div style="margin-top:12px;font-size:9px;color:var(--green);">
+           LABELED · PDU MANAGED · CABLE RINGS · CAT6 · BLANKING PANELS FITTED
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:var(--w30);margin-top:8px;letter-spacing:1px;">
+        RECOMMENDED STATE — STRUCTURED & DOCUMENTED
+      </div>
+    </div>
+
+    <div class="au d3">
+      <h3 style="margin-bottom:14px;color:var(--green);">Cat6 Re-Cabling Scope</h3>
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+        <table class="tbl">
+          <thead><tr><th>Item</th><th>Detail</th><th>Est. Qty</th></tr></thead>
+          <tbody>
+            <tr><td>Cat6 UTP Patch Cable</td><td>2m, various colors, labeled both ends</td><td>~50 pcs</td></tr>
+            <tr><td>1U Horizontal Cable Manager</td><td>D-ring style, for every 2U of patch</td><td>~6 units</td></tr>
+            <tr><td>Vertical Cable Manager</td><td>Side-mount, 42U height</td><td>1 pair</td></tr>
+            <tr><td>Patch Panel</td><td>Cat6, 24P or 48P, keystone loaded</td><td>1–2 units</td></tr>
+            <tr><td>Blanking Panels</td><td>1U, fill unused rack space</td><td>~10 pcs</td></tr>
+            <tr><td>Brady Label Set</td><td>Patch panel + cable end labels</td><td>1 kit</td></tr>
+            <tr><td>Rack-Mount PDU</td><td>Metered, 8–16 outlet</td><td>1 unit</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice n-gold">
+        <strong>Procurement Note:</strong> The full rack re-cabling scope (Cat6 runs, keystone replacement, new face plates, labor) should be obtained as an <strong>all-inclusive quote from the IT supplier</strong>. Confirm exact cable count after site survey.
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;"></span>
+          <div><strong style="font-size:13px;">Cat6 · 1 Gbps / 250 MHz</strong><br>
+            <span style="font-size:12px;">10× speed increase over Cat5. Future-proofed for PoE+ and gigabit to every desk.</span></div>
+        </div>
+        <div class="card" style="padding:13px;display:flex;gap:10px;">
+          <span style="color:var(--green);font-size:16px;"></span>
+          <div><strong style="font-size:13px;">Full labeling standard</strong><br>
+            <span style="font-size:12px;">Every port and cable end labeled. Port map document maintained. Fault isolation in minutes, not hours.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 06 · IT — CABLING HORIZONTAL
+══════════════════════════════════════════════ -->
+<section class="slide" id="s6" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Horizontal Cabling — Current State</div>
+  <h2 class="au d1">Office Cabling — Cat5 with No Trunking or Face Plate Labels</h2>
+  <div class="div"></div>
+
+  <div class="cmp au d2" style="margin-bottom:20px;">
+    <div class="cmp-col before">
+      <div class="cmp-hd">Warning CURRENT — PROBLEMS</div>
+      <div class="cmp-body">
+        <ul>
+          <li> All horizontal runs in Cat5 — max 100 Mbps</li>
+          <li> No cable trunking or conduit along walls</li>
+          <li> No dedicated pathways for cabling</li>
+          <li> Network face plates have no labels</li>
+          <li> Some offices lack sufficient network points</li>
+          <li> Network splitters (hubs) in use as a workaround</li>
+          <li> Cat5 modules in face plates — mismatched performance</li>
+          <li> Runs exposed and unprotected in some areas</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cmp-arr">→</div>
+    <div class="cmp-col after">
+      <div class="cmp-hd"> RECOMMENDED — RESOLUTION</div>
+      <div class="cmp-body">
+        <ul>
+          <li> Re-run all horizontal cabling in Cat6 UTP</li>
+          <li> Install cable trunking along skirting/ceiling paths</li>
+          <li> Add conduit for exposed cable sections</li>
+          <li> Label all face plates with room/port ID</li>
+          <li> Increase network point density in under-served offices</li>
+          <li> Remove all splitters — direct port for every device</li>
+          <li> Replace all modules with Cat6 keystone jacks</li>
+          <li> Cable map document updated and maintained</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="g3 au d3">
+    <div class="card" style="padding:18px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:10px;">Network</div>
+      <h3>Network Splitters</h3>
+      <p style="font-size:12px;">Using unmanaged hubs/splitters introduces collision domains and limits bandwidth. All devices on a hub share 100 Mbps instead of each having dedicated 1 Gbps.</p>
+      <div style="margin-top:10px;"><span class="badge b-red">Remove All</span></div>
+    </div>
+    <div class="card" style="padding:18px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:10px;">Labeling</div>
+      <h3>Face Plate Labeling</h3>
+      <p style="font-size:12px;">Every network outlet must be labeled with a unique port ID that maps to the patch panel. This is the foundation of any maintainable structured cabling system.</p>
+      <div style="margin-top:10px;"><span class="badge b-blue">Standard Practice</span></div>
+    </div>
+    <div class="card" style="padding:18px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:10px;">Cabling</div>
+      <h3>New Cat6 Modules</h3>
+      <p style="font-size:12px;">Replace all Cat5 face plate modules with Cat6 keystone jacks. Mixing cable grades creates a performance bottleneck at the weakest link in the run.</p>
+      <div style="margin-top:10px;"><span class="badge b-green">Performance Gain</span></div>
+    </div>
+  </div>
+
+  <div class="notice n-gold au d4" style="margin-top:16px;">
+    <strong>Procurement Note:</strong> Horizontal re-cabling (trunking, Cat6 runs, new face plates, Cat6 modules, labeling) should be obtained as an <strong>all-inclusive quote from the IT supplier</strong>, following a site survey to confirm all run lengths and port counts.
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 07 · IT — WIFI CURRENT + RECOMMENDED
+══════════════════════════════════════════════ -->
+<section class="slide" id="s7" style="background:#060e1c;">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:460px;height:460px;background:rgba(29,106,191,.1);right:-80px;top:50%;transform:translateY(-50%);"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Wireless Network</div>
+  <h2 class="au d1">Wi-Fi — Single 2006 Cisco AP → 3× Wi-Fi 6 APs</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <div class="au d2">
+      <!-- OLD AP -->
+      <div class="card c-red" style="padding:20px;margin-bottom:16px;">
+        <h3 style="color:var(--red);margin-bottom:14px;">Warning Current: Single AP — 2006 Model</h3>
+        <div class="ap-device" style="margin-bottom:14px;padding:16px;">
+          <div class="wifi-bars">
+            <div class="wb wb-old" style="height:8px;"></div>
+            <div class="wb wb-old" style="height:14px;"></div>
+            <div class="wb wb-old" style="height:20px;opacity:.6;"></div>
+            <div class="wb wb-old" style="height:26px;opacity:.3;"></div>
+          </div>
+          <div style="font-size:10px;color:#9ca3af;letter-spacing:1px;">CISCO AP · ~2006 MODEL<br>
+            802.11b/g · 2.4GHz ONLY</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>No management or configuration interface</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>Placed on top of metal rack — blocks RF</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>Single 2.4 GHz band — congested frequency</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>Frequent packet loss and connection drops</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>No roaming — dead zones throughout office</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>WEP / WPA — outdated security standards</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="au d3">
+      <div class="card c-green" style="padding:20px;margin-bottom:16px;">
+        <h3 style="color:var(--green);margin-bottom:14px;"> Recommended: 3× Cisco Wi-Fi 6 APs</h3>
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div class="ap-new" style="flex:1;">
+            <div class="wifi-bars">
+              <div class="wb wb-new" style="height:10px;"></div>
+              <div class="wb wb-new" style="height:17px;"></div>
+              <div class="wb wb-new" style="height:24px;"></div>
+              <div class="wb wb-new" style="height:31px;"></div>
+            </div>
+            <div style="font-size:9px;color:var(--blue-light);letter-spacing:1px;margin-top:6px;">
+              CISCO C9105AXI<br>Wi-Fi 6 · PoE+
+            </div>
+          </div>
+          <div class="ap-new" style="flex:1;">
+            <div class="wifi-bars">
+              <div class="wb wb-new" style="height:10px;"></div>
+              <div class="wb wb-new" style="height:17px;"></div>
+              <div class="wb wb-new" style="height:24px;"></div>
+              <div class="wb wb-new" style="height:31px;"></div>
+            </div>
+            <div style="font-size:9px;color:var(--blue-light);letter-spacing:1px;margin-top:6px;">
+              CISCO C9105AXI<br>Wi-Fi 6 · PoE+
+            </div>
+          </div>
+          <div class="ap-new" style="flex:1;">
+            <div class="wifi-bars">
+              <div class="wb wb-new" style="height:10px;"></div>
+              <div class="wb wb-new" style="height:17px;"></div>
+              <div class="wb wb-new" style="height:24px;"></div>
+              <div class="wb wb-new" style="height:31px;"></div>
+            </div>
+            <div style="font-size:9px;color:var(--blue-light);letter-spacing:1px;margin-top:6px;">
+              CISCO C9105AXI<br>Wi-Fi 6 · PoE+
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>Wi-Fi 6 (802.11ax) — dual-band 2.4 + 5 GHz</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>Ceiling-mounted per RF site plan — full coverage</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>PoE+ powered from new switch — no power adapter</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>Cisco DNA Center or Meraki cloud management</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>WPA3 enterprise-grade security</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--green);"></span>
+            <span>Fast BSS roaming — seamless handoff between APs</span>
+          </div>
+        </div>
+
+        <!-- price -->
+        <div class="notice n-info" style="margin:0;">
+          <strong>Cisco Catalyst C9105AXI</strong> — Wi-Fi 6, indoor, internal antenna, PoE+<br>
+           Market price: <strong>≈ €380–430 EUR per unit</strong><br>
+          <strong>3 units: ≈ €1140 – €1,290 EUR</strong><br><span class="price-note">Final pricing subject to supplier quotation. Prices exclude VAT, shipping, delivery and installation unless otherwise stated.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 08 · IT — UPS / POWER
+══════════════════════════════════════════════ -->
+<section class="slide" id="s8" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">IT · Power Management</div>
+  <h2 class="au d1">UPS — 15+ Year Old Battery Requires Replacement</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <div class="au d2">
+      <div class="card c-orange" style="padding:22px;margin-bottom:16px;">
+        <h3 style="color:var(--orange);margin-bottom:16px;">Power Current UPS Status — APC Unit ≈ 2010</h3>
+
+        <!-- battery meter -->
+        <div style="margin-bottom:18px;">
+          <div class="prog-label"><span style="color:var(--w70);">Battery Health</span><span style="color:var(--orange);">~15–20% effective</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:17%;background:linear-gradient(90deg,var(--orange),var(--gold));"></div></div>
+        </div>
+        <div style="margin-bottom:18px;">
+          <div class="prog-label"><span style="color:var(--w70);">Backup Runtime (actual)</span><span style="color:var(--orange);">~10 minutes</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:17%;background:linear-gradient(90deg,var(--red),var(--orange));"></div></div>
+        </div>
+        <div style="margin-bottom:18px;">
+          <div class="prog-label"><span style="color:var(--w70);">Battery Age</span><span style="color:var(--red);">15+ years</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--red),var(--red));animation-delay:0s;"></div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--orange);">Warning</span>
+            <span>APC UPS unit functional but battery capacity severely degraded</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--orange);">Warning</span>
+            <span>VRLA battery life expectancy is 3–5 years — currently 15+</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--orange);">Warning</span>
+            <span>~10 min backup is insufficient for safe server shutdown</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:12px;">
+            <span style="color:var(--red);"></span>
+            <span>Risk of battery swelling, leakage, or total failure at any time</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="au d3">
+      <div class="card c-green" style="padding:22px;">
+        <h3 style="color:var(--green);margin-bottom:16px;"> Recommended: New UPS with 1-Hour Runtime Target</h3>
+
+        <div style="margin-bottom:16px;">
+          <div class="prog-label"><span style="color:var(--w70);">Target Backup Runtime</span><span style="color:var(--green);">≥ 60 minutes</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:100%;background:linear-gradient(90deg,var(--green),var(--blue-bright));"></div></div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+          <div class="card" style="padding:12px;display:flex;gap:10px;">
+            <span style="color:var(--green);font-size:16px;"></span>
+            <div><strong style="font-size:13px;">New APC Smart-UPS or equivalent</strong><br>
+              <span style="font-size:12px;">Recommended: APC Smart-UPS 1500VA / 2200VA with 1-hour runtime via extended battery module.</span></div>
+          </div>
+          <div class="card" style="padding:12px;display:flex;gap:10px;">
+            <span style="color:var(--green);font-size:16px;"></span>
+            <div><strong style="font-size:13px;">SNMP Management Card</strong><br>
+              <span style="font-size:12px;">Remote monitoring, battery health alerts, auto-shutdown scripting for the server on power failure.</span></div>
+          </div>
+          <div class="card" style="padding:12px;display:flex;gap:10px;">
+            <span style="color:var(--green);font-size:16px;"></span>
+            <div><strong style="font-size:13px;">60-Minute Runtime Buffer</strong><br>
+              <span style="font-size:12px;">Sufficient time for controlled shutdown, work completion, and notification in any power outage scenario.</span></div>
+          </div>
+          <div class="card" style="padding:12px;display:flex;gap:10px;">
+            <span style="color:var(--green);font-size:16px;"></span>
+            <div><strong style="font-size:13px;">3–5 Year Battery Lifecycle</strong><br>
+              <span style="font-size:12px;">Schedule battery replacement every 3–5 years as part of IT maintenance plan. Set calendar reminder on install date.</span></div>
+          </div>
+        </div>
+
+        <div class="notice n-gold">
+          <strong>Procurement Note:</strong> UPS replacement (unit + battery + SNMP card + installation) should be obtained as an <strong>all-inclusive quote from the IT supplier</strong>, sizing to actual measured load.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 09 · AV — DIVIDER / SECTION INTRO
+══════════════════════════════════════════════ -->
+<section class="slide" id="s9" style="background:linear-gradient(135deg,#040c1a 0%,#0c1e3a 60%,#070f1e 100%);">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:500px;height:500px;background:rgba(29,106,191,.18);right:-80px;top:50%;transform:translateY(-50%);"></div>
+<svg class="circuits" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4caf82" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#4caf82" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#4caf82" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M0,400 L400,400 L400,200 L800,200" stroke="url(#lg2)" stroke-width="1.5" fill="none"/>
+  <path d="M1400,350 L1000,350 L1000,550 L700,550" stroke="url(#lg2)" stroke-width="1.5" fill="none"/>
+  <circle cx="400" cy="400" r="4" fill="#4caf82"/>
+  <circle cx="400" cy="200" r="4" fill="#4caf82"/>
+  <circle cx="1000" cy="350" r="4" fill="#4caf82"/>
+  <circle cx="1000" cy="550" r="4" fill="#4caf82"/>
+</svg>
+
+<div class="content" style="max-width:800px;">
+  <div class="eyebrow au">Part 2 of 2</div>
+  <h1 class="au d1" style="font-size:clamp(32px,5vw,60px);">AV Systems<br><span style="color:var(--blue-light);">Show Room</span><br>Assessment</h1>
+  <div class="div"></div>
+  <p class="au d3" style="font-size:15px;max-width:520px;">
+    The Show Room AV system is used daily for presentations, client demos, and internal meetings.
+    Current equipment is analog-era technology — incompatible with modern devices and delivering
+    poor audio and visual quality.
+  </p>
+  <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;" class="au d4">
+    <span class="badge b-red">VGA Signal — Obsolete</span>
+    <span class="badge b-red">Active Speaker Hum</span>
+    <span class="badge b-gold">Handheld Mics — OK</span>
+  </div>
+  <div style="display:flex;gap:32px;margin-top:36px;flex-wrap:wrap;" class="au d5">
+    <div><div class="stat-num" style="font-size:36px;">3</div><div class="stat-label">AV Components</div></div>
+    <div style="width:1px;background:var(--w15);"></div>
+    <div><div class="stat-num" style="font-size:36px;">2</div><div class="stat-label">Need Full Replacement</div></div>
+    <div style="width:1px;background:var(--w15);"></div>
+    <div><div class="stat-num" style="font-size:36px;">1</div><div class="stat-label">Retained (Microphones)</div></div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 10 · AV — DISPLAY CURRENT + RECOMMENDED
+══════════════════════════════════════════════ -->
+<section class="slide" id="s10" style="background:#060e1c;">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">AV · Show Room — Display System</div>
+  <h2 class="au d1">VGA Projector → HDMI-based Modern Projection</h2>
+  <div class="div"></div>
+
+  <div class="cmp au d2" style="margin-bottom:22px;">
+    <div class="cmp-col before">
+      <div class="cmp-hd">Warning CURRENT — VGA PROJECTOR</div>
+      <div class="cmp-body">
+        <ul>
+          <li> VGA analog signal — D-Sub 15 connector</li>
+          <li> Max resolution: 1024×768 (XGA) native</li>
+          <li> No audio channel over display cable</li>
+          <li> Motion blur / ghosting on dense text slides</li>
+          <li> Requires dedicated laptop with VGA port</li>
+          <li> No wireless / screen-cast capability</li>
+          <li> Old lamp-based projector — warm-up delay</li>
+          <li> Poor color accuracy and brightness</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cmp-arr">→</div>
+    <div class="cmp-col after">
+      <div class="cmp-hd"> RECOMMENDED — HDMI PROJECTOR / DISPLAY</div>
+      <div class="cmp-body">
+        <ul>
+          <li> HDMI 2.0 input — universal on all modern laptops</li>
+          <li> Full HD 1080p minimum / 4K optional</li>
+          <li> Audio over HDMI — one cable for AV</li>
+          <li> Sharp text, no motion blur — ideal for slides</li>
+          <li> Any modern laptop, phone or tablet connects</li>
+          <li> Wireless casting: AirPlay / Miracast / Chromecast</li>
+          <li> LED/laser light source — instant-on, no warm-up</li>
+          <li> Better color gamut, brightness and contrast</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2 au d3" style="gap:20px;">
+    <div>
+      <div style="background:#111827;border-radius:10px;padding:16px;border:1px solid #374151;text-align:center;margin-bottom:12px;">
+        <div style="font-size:11px;color:#9ca3af;letter-spacing:1px;margin-bottom:8px;">VGA — ANALOG SIGNAL PATH</div>
+        <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <div style="background:#1c2333;border:1px solid #374151;border-radius:4px;padding:6px 10px;font-size:10px;color:#9ca3af;">LAPTOP</div>
+          <div style="color:#ef4444;font-size:14px;">→</div>
+          <div style="background:#1c2333;border:1px solid #ef4444;border-radius:4px;padding:6px 10px;font-size:10px;color:#ef4444;">VGA ADAPTER</div>
+          <div style="color:#ef4444;font-size:14px;">→</div>
+          <div style="background:#1c2333;border:1px solid #374151;border-radius:4px;padding:6px 10px;font-size:10px;color:#9ca3af;">VGA CABLE</div>
+          <div style="color:#ef4444;font-size:14px;">→</div>
+          <div style="background:#1c2333;border:1px solid #374151;border-radius:4px;padding:6px 10px;font-size:10px;color:#9ca3af;">PROJECTOR</div>
+        </div>
+        <div style="font-size:10px;color:#ef4444;margin-top:8px;">Analog signal → quality loss + adapter dependency</div>
+      </div>
+    </div>
+    <div>
+      <div style="background:linear-gradient(135deg,#0a1628,#1a3a6b);border-radius:10px;padding:16px;border:1px solid rgba(45,140,240,.4);text-align:center;margin-bottom:12px;">
+        <div style="font-size:11px;color:var(--blue-light);letter-spacing:1px;margin-bottom:8px;">HDMI — DIGITAL SIGNAL PATH</div>
+        <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <div style="background:rgba(45,140,240,.12);border:1px solid rgba(45,140,240,.3);border-radius:4px;padding:6px 10px;font-size:10px;color:var(--blue-light);">ANY LAPTOP</div>
+          <div style="color:var(--green);font-size:14px;">→</div>
+          <div style="background:rgba(76,175,130,.12);border:1px solid rgba(76,175,130,.3);border-radius:4px;padding:6px 10px;font-size:10px;color:var(--green);">HDMI CABLE</div>
+          <div style="color:var(--green);font-size:14px;">→</div>
+          <div style="background:rgba(45,140,240,.12);border:1px solid rgba(45,140,240,.3);border-radius:4px;padding:6px 10px;font-size:10px;color:var(--blue-light);">PROJECTOR</div>
+        </div>
+        <div style="font-size:10px;color:var(--green);margin-top:8px;">Digital signal → full quality + no adapters needed</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice n-gold au d4">
+    <strong>Procurement Note:</strong> Display/projector upgrade (HDMI projector or LED panel, cables, mounting, installation) should be obtained as an <strong>all-inclusive quote from the AV/IT supplier</strong>, based on room dimensions and throw distance.
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 11 · AV — AUDIO SYSTEM
+══════════════════════════════════════════════ -->
+<section class="slide" id="s11" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">AV · Show Room — Audio System</div>
+  <h2 class="au d1">Active Speakers with Ground Loop Hum → Professional Passive System</h2>
+  <div class="div"></div>
+
+  <div class="cmp au d2" style="margin-bottom:20px;">
+    <div class="cmp-col before">
+      <div class="cmp-hd">Warning CURRENT — ACTIVE SPEAKERS + ANALOG DESK</div>
+      <div class="cmp-body">
+        <ul>
+          <li> Active (powered) speakers sharing AC circuit</li>
+          <li> Severe 60Hz ground loop hum</li>
+          <li> Analog mixing console — no digital control</li>
+          <li> No dedicated circuit for audio equipment</li>
+          <li> 3.5mm analog input only</li>
+          <li> No echo or noise cancellation</li>
+          <li> No room acoustic design</li>
+          <li> 2× handheld microphones — no issue</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cmp-arr">→</div>
+    <div class="cmp-col after">
+      <div class="cmp-hd"> RECOMMENDED — PASSIVE SPEAKER + AMPLIFIER</div>
+      <div class="cmp-body">
+        <ul>
+          <li> Passive speakers + dedicated power amplifier</li>
+          <li> Dedicated circuit isolates audio — zero hum</li>
+          <li> Professional digital mixer with USB audio</li>
+          <li> Galvanic isolation eliminates ground loop</li>
+          <li> XLR / USB / Bluetooth / HDMI ARC input</li>
+          <li> AI echo and noise cancellation optional</li>
+          <li> Consistent SPL throughout room</li>
+          <li> Retain existing 2× handheld microphones</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2 au d3" style="gap:20px;">
+    <div>
+      <h3 style="margin-bottom:12px;">Why Active Speakers Hum</h3>
+      <div class="card" style="padding:16px;margin-bottom:10px;">
+        <p style="font-size:13px;">Active speakers have built-in amplifiers that share the same AC circuit as computers, monitors, and AV equipment. This creates a <strong style="color:var(--white);">ground loop</strong> — a difference in ground potential between devices that induces a 50/60Hz current into the audio signal chain, heard as a constant buzz or hum.</p>
+      </div>
+      <div class="notice n-warn">
+         The hum is NOT a speaker defect — it is a system-level electrical isolation problem. Even new active speakers would hum in this configuration. The fix is architectural: separate the amplification from shared power circuits.
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-bottom:12px;">Recommended Brand Options</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card c-blue" style="padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong>JBL Conference / Control Series</strong>
+            <span class="badge b-blue">Option A</span>
+          </div>
+          <p style="font-size:12px;">JBL Control 1 Pro or similar — small form passive ceiling/wall speaker. Proven in small-medium meeting rooms. Good SPL distribution and flat frequency response for voice.</p>
+          <div style="margin-top:8px;" class="notice n-info" style="padding:8px;font-size:11px;margin:8px 0 0;">
+            Indicative system cost (speakers + amplifier + cabling): <strong>≈ €740 – €1,390 EUR</strong><br><span class="price-note">Final pricing subject to supplier quotation. Prices exclude VAT, shipping, delivery and installation unless otherwise stated.</span>
+          </div>
+        </div>
+        <div class="card c-green" style="padding:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong>Bose Professional DS Series</strong>
+            <span class="badge b-green">Option B</span>
+          </div>
+          <p style="font-size:12px;">Bose DS 16F or DS 40F — designed for conferencing and presentation rooms. Excellent intelligibility, wide dispersion, low profile mounting.</p>
+          <div style="margin-top:8px;" class="notice n-ok" style="padding:8px;font-size:11px;margin:8px 0 0;">
+            Indicative system cost (speakers + amplifier + cabling): <strong>≈ €1,110 – €1,850 EUR</strong><br><span class="price-note">Final pricing subject to supplier quotation. Prices exclude VAT, shipping, delivery and installation unless otherwise stated.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 12 · AV — WIRELESS PRESENTATION
+══════════════════════════════════════════════ -->
+<section class="slide" id="s12" style="background:#060e1c;">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:500px;height:500px;background:rgba(29,106,191,.12);right:0;top:50%;transform:translateY(-50%);"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">AV · Show Room — Wireless Presentation</div>
+  <h2 class="au d1">Recommended: Logitech Rally Bar Mini + Barco ClickShare</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:28px;">
+    <div class="au d2">
+      <div class="card c-blue" style="padding:22px;margin-bottom:16px;">
+        <h3 style="margin-bottom:14px;">Wireless Presentation + Logitech Video Collaboration</h3>
+        <p style="font-size:13px;margin-bottom:14px;">
+          The recommended AV upgrade combines Barco ClickShare for wireless presentation with a Logitech Rally Bar Mini for camera, microphone and speaker functions. This provides a cleaner and more reliable Teams / Zoom / Meet experience for the Show Room.
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+          <span class="badge b-green">1-Click Connect</span>
+          <span class="badge b-blue">BYOD Friendly</span>
+          <span class="badge b-blue">Platform Agnostic</span>
+          <span class="badge b-green">5-Year Warranty</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Logitech Rally Bar Mini Camera</strong> — 4K sensor, motorized PTZ, AI viewfinder and automatic framing</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Logitech Beamforming Microphones</strong> — echo cancellation, noise suppression and room-optimized pickup</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Integrated Logitech Speakers</strong> — full-duplex audio for small to medium meeting rooms</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Wireless from any platform</strong> — AirPlay, Google Cast, Miracast, ClickShare App</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Teams / Zoom / Meet</strong> — works with all major UC platforms BYOM (Bring Your Own Meeting)</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;">
+            <span style="color:var(--green);flex-shrink:0;"></span>
+            <span><strong style="color:var(--white);">Connect in 7 seconds</strong> — plug ClickShare Button, click, presenting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="au d3">
+      <!-- device visual -->
+      <div style="background:linear-gradient(135deg,#0a1628,#1a3a6b);border-radius:14px;
+        border:1px solid rgba(45,140,240,.4);padding:20px;text-align:center;margin-bottom:16px;
+        box-shadow:0 0 30px rgba(45,140,240,.12);">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--blue-light);margin-bottom:12px;">
+          LOGITECH RALLY BAR MINI + CLICKSHARE
+        </div>
+        <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:14px;
+          border:1px solid rgba(45,140,240,.2);display:inline-block;margin-bottom:12px;">
+          <div style="font-size:24px;">Storage Status</div>
+          <div style="width:120px;height:8px;background:rgba(45,140,240,.3);border-radius:4px;margin:6px auto 2px;"></div>
+          <div style="width:80px;height:6px;background:rgba(45,140,240,.2);border-radius:3px;margin:0 auto;"></div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;">
+          <span class="badge b-green">Logitech Camera</span>
+          <span class="badge b-blue">Beamforming Mic</span>
+          <span class="badge b-blue">ClickShare Wireless</span>
+        </div>
+        <div style="margin-top:12px;font-size:10px;color:var(--w70);">
+          Camera/Speaker: Logitech Rally Bar Mini · Wireless Presentation: Barco ClickShare
+        </div>
+      </div>
+
+      <!-- specs -->
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+        <table class="tbl">
+          <thead><tr><th>Spec</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>Camera</td><td>Logitech Rally Bar Mini, 4K sensor, motorized PTZ, AI framing</td></tr>
+            <tr><td>Microphones</td><td>Logitech beamforming microphones, echo cancellation and noise suppression</td></tr>
+            <tr><td>Speakers</td><td>Integrated Logitech full-duplex speakers</td></tr>
+            <tr><td>Wireless Standard</td><td>802.11 a/g/n/ac, 2.4 + 5 GHz</td></tr>
+            <tr><td>Connectivity</td><td>USB / HDMI / LAN depending on selected Rally Bar + ClickShare configuration</td></tr>
+            <tr><td>Security</td><td>WPA2-PSK / WPA2 802.1X</td></tr>
+            <tr><td>Warranty</td><td>5-Year SmartCare (free on registration)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice n-info">
+        <strong>Logitech Rally Bar Mini + Barco ClickShare</strong><br>
+        Indicative combined equipment price: <strong>≈ €2,200 – €3,200 EUR</strong> depending on configuration, region and reseller<br>
+        <span class="price-note">Prices exclude VAT, shipping, delivery and installation unless otherwise stated.</span><br>
+        Includes: Logitech video bar + wireless presentation system, final model selection subject to AV supplier confirmation
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 13 · BUDGET SUMMARY
+══════════════════════════════════════════════ -->
+<section class="slide" id="s13" style="background:linear-gradient(160deg,#060e1c 0%,#0c1a30 100%);">
+<div class="bg-grid"></div>
+
+<div class="content" style="max-width:1100px;width:100%;">
+  <div class="slabel au">Financial Overview</div>
+  <h2 class="au d1">Budget Summary — GP Infrastructure Renovation</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:24px;">
+    <div class="au d2">
+      <h3 style="margin-bottom:12px;">IT Section — Estimated Costs</h3>
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;margin-bottom:14px;">
+        <table class="tbl">
+          <thead><tr><th>Item</th><th>Approach</th><th>Est. Cost</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>NAS (Synology DS225+) + 2× 4TB WD Red Plus CMR HDD + 2TB External HDD backup</td>
+              <td>Direct purchase</td>
+              <td class="price-col">≈ €970</td>
+            </tr>
+            <tr>
+              <td>Wi-Fi 6 APs — Cisco C9105AXI × 3</td>
+              <td>Direct purchase</td>
+              <td class="price-col">≈ €1290</td>
+            </tr>
+            <tr>
+              <td>IT Rack Re-cabling (Cat6, cable mgmt, labels, PDU, labor)</td>
+              <td>Supplier Quote</td>
+              <td class="price-col">Supplier Quote Required</td>
+            </tr>
+            <tr>
+              <td>Horizontal Cabling (Cat6 runs, trunking, face plates, modules)</td>
+              <td>Supplier Quote</td>
+              <td class="price-col">Supplier Quote Required</td>
+            </tr>
+            <tr>
+              <td>UPS Replacement (unit + battery + SNMP + labor)</td>
+              <td>Supplier Quote</td>
+              <td class="price-col">Supplier Quote Required</td>
+            </tr>
+            <tr class="tbl-total">
+              <td colspan="2">IT Section Subtotal (known items)</td>
+              <td>≈ €1,680 + Supplier Quote Required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-bottom:12px;">AV Section — Estimated Costs</h3>
+      <div style="background:var(--w04);border:1px solid var(--w08);border-radius:12px;overflow:hidden;">
+        <table class="tbl">
+          <thead><tr><th>Item</th><th>Approach</th><th>Est. Cost</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>HDMI Projector / Display upgrade (incl. mounting, install)</td>
+              <td>Supplier Quote</td>
+              <td class="price-col">Supplier Quote Required</td>
+            </tr>
+            <tr>
+              <td>Passive speaker system — JBL or Bose + amplifier</td>
+              <td>Supplier Quote</td>
+              <td class="price-col">≈ €740–€1,850</td>
+            </tr>
+            <tr>
+              <td>Barco ClickShare Bar Core (wireless presentation)</td>
+              <td>Direct / Reseller</td>
+              <td class="price-col">≈ €2,200–€3,200</td>
+            </tr>
+            <tr class="tbl-total">
+              <td colspan="2">AV Section Subtotal (known items)</td>
+              <td>≈ €2,940–€5,050 + Supplier Quote Required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="au d3">
+      <div class="notice n-warn" style="margin-bottom:16px;">
+        <strong>Pricing Note:</strong> All estimated costs shown in this report are indicative and exclude VAT, shipping, delivery and installation unless otherwise stated.<br><br>
+        Warning <strong>Supplier Quote Required = To Be Quoted</strong> by IT/AV supplier following site survey. These items require a technician visit to measure cable runs, confirm rack configuration, and assess room acoustics before pricing.
+      </div>
+
+      <h3 style="margin-bottom:14px;">Priority Sequence</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="card c-red" style="padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="background:var(--red);color:var(--white);border-radius:50%;width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">1</div>
+          <div>
+            <strong style="font-size:13px;">Data Backup + NAS</strong>
+            <p style="font-size:12px;margin-top:2px;">Back up existing data to external HDD immediately. Order NAS within 1 week. Critical — risk of irreversible data loss.</p>
+          </div>
+        </div>
+        <div class="card c-orange" style="padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="background:var(--orange);color:var(--white);border-radius:50%;width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">2</div>
+          <div>
+            <strong style="font-size:13px;">Wi-Fi + UPS</strong>
+            <p style="font-size:12px;margin-top:2px;">Replace single AP with 3× Wi-Fi 6 units. Replace UPS battery/unit for proper backup runtime.</p>
+          </div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="background:var(--blue-accent);color:var(--white);border-radius:50%;width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">3</div>
+          <div>
+            <strong style="font-size:13px;">IT Rack + Cabling</strong>
+            <p style="font-size:12px;margin-top:2px;">Full rack re-cabling with Cat6, cable managers, labels, PDU. Request supplier site survey and quote.</p>
+          </div>
+        </div>
+        <div class="card" style="padding:14px;display:flex;align-items:center;gap:12px;">
+          <div style="background:var(--blue-mid);color:var(--white);border-radius:50%;width:28px;height:28px;
+            display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;">4</div>
+          <div>
+            <strong style="font-size:13px;">AV Show Room</strong>
+            <p style="font-size:12px;margin-top:2px;">HDMI projector, passive speaker system, Logitech video bar + ClickShare wireless presentation. Request AV supplier quote after site survey.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SLIDE 14 · CLOSING / NEXT STEPS
+══════════════════════════════════════════════ -->
+<section class="slide" id="s14" style="background:linear-gradient(135deg,#040c1a 0%,#0c1e3a 55%,#070f1e 100%);">
+<div class="bg-grid"></div>
+<div class="bg-glow" style="width:600px;height:600px;background:rgba(76,175,130,.07);right:-100px;top:-100px;"></div>
+<div class="bg-glow" style="width:400px;height:400px;background:rgba(29,106,191,.1);left:-60px;bottom:-60px;"></div>
+<svg class="circuits" viewBox="0 0 1400 800" preserveAspectRatio="xMidYMid slice" style="opacity:.08;">
+  <defs>
+    <linearGradient id="lg3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4caf82" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#4caf82" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#4caf82" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M0,350 L500,350 L500,200 L1000,200" stroke="url(#lg3)" stroke-width="2" fill="none"/>
+  <path d="M1400,450 L900,450 L900,600 L600,600" stroke="url(#lg3)" stroke-width="2" fill="none"/>
+  <circle cx="500" cy="350" r="5" fill="#4caf82"/>
+  <circle cx="500" cy="200" r="5" fill="#4caf82"/>
+  <circle cx="900" cy="450" r="5" fill="#4caf82"/>
+</svg>
+
+<div class="content" style="max-width:960px;">
+  <div class="eyebrow au">Conclusion &amp; Recommended Next Steps</div>
+  <h2 class="au d1" style="font-size:clamp(26px,4.5vw,54px);">Transform GP into a<br><span style="color:var(--blue-light);">Reliable, Secure</span><br>Modern Workplace</h2>
+  <div class="div"></div>
+
+  <div class="g2" style="gap:16px;margin-top:8px;">
+    <div class="card c-blue au d2" style="padding:20px;">
+      <h3 style="margin-bottom:12px;">Action Items Action Items — IT Team</h3>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+        <li style="font-size:12px;color:var(--w70);">→ <strong style="color:var(--white);">IMMEDIATELY:</strong> Back up HP server data to external HDD</li>
+        <li style="font-size:12px;color:var(--w70);">→ Order Synology DS225+ NAS + 2× 4TB WD Red Plus CMR drives</li>
+        <li style="font-size:12px;color:var(--w70);">→ Order 3× Cisco C9105AXI Wi-Fi 6 APs</li>
+        <li style="font-size:12px;color:var(--w70);">→ Schedule IT supplier site survey (rack + cabling + UPS)</li>
+        <li style="font-size:12px;color:var(--w70);">→ Schedule AV supplier site survey (projector + audio + Logitech camera + ClickShare)</li>
+        <li style="font-size:12px;color:var(--w70);">→ Obtain quotes from minimum 2 suppliers per section</li>
+        <li style="font-size:12px;color:var(--w70);">→ Define maintenance calendar (UPS battery: every 3–5 years)</li>
+      </ul>
+    </div>
+
+    <div class="card c-green au d3" style="padding:20px;">
+      <h3 style="color:var(--green);margin-bottom:12px;">Expected Outcomes</h3>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+        <li style="font-size:12px;color:var(--w70);"> Data protected with RAID 1 NAS + cloud backup</li>
+        <li style="font-size:12px;color:var(--w70);"> 1 Gbps to all desks — 10× current bandwidth</li>
+        <li style="font-size:12px;color:var(--w70);"> Wi-Fi 6 coverage throughout entire office</li>
+        <li style="font-size:12px;color:var(--w70);"> Clean, labeled, maintainable rack infrastructure</li>
+        <li style="font-size:12px;color:var(--w70);"> 60-min UPS backup — safe for any power event</li>
+        <li style="font-size:12px;color:var(--w70);"> Any laptop connects to Show Room in under 10 sec</li>
+        <li style="font-size:12px;color:var(--w70);"> Clear, hum-free audio in every meeting</li>
+      </ul>
+    </div>
+  </div>
+
+
+
+  <div class="card c-gold au d4" style="padding:20px;margin-top:22px;">
+    <h3 style="color:var(--gold);margin-bottom:12px;">Management Approval Requested</h3>
+    <div class="g3" style="gap:12px;">
+      <div class="notice n-gold" style="margin:0;">Approve Phase 1 emergency backup and NAS deployment.</div>
+      <div class="notice n-info" style="margin:0;">Approve supplier quotation process for IT, cabling, Wi-Fi and AV sections.</div>
+      <div class="notice n-ok" style="margin:0;">Approve phased infrastructure renovation planning.</div>
+    </div>
+    <div class="approval-grid">
+      <div class="signature-box"><div class="signature-label">Prepared By</div><div class="signature-line"></div></div>
+      <div class="signature-box"><div class="signature-label">Approved By</div><div class="signature-line"></div></div>
+      <div class="signature-box"><div class="signature-label">Date</div><div class="signature-line"></div></div>
+    </div>
+  </div>
+
+  <!-- final stats -->
+  <div class="g4 au d4" style="margin-top:22px;">
+    <div class="card" style="padding:18px;text-align:center;">
+      <div class="stat-num">RAID 1</div>
+      <div class="stat-label">Data Protection</div>
+    </div>
+    <div class="card" style="padding:18px;text-align:center;">
+      <div class="stat-num">1 Gbps</div>
+      <div class="stat-label">Network to Desk</div>
+    </div>
+    <div class="card" style="padding:18px;text-align:center;">
+      <div class="stat-num">Wi-Fi 6</div>
+      <div class="stat-label">Wireless Standard</div>
+    </div>
+    <div class="card" style="padding:18px;text-align:center;">
+      <div class="stat-num">60 min</div>
+      <div class="stat-label">UPS Runtime Target</div>
+    </div>
+  </div>
+
+  <div class="au d5" style="margin-top:26px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div style="font-size:12px;color:var(--w70);">Prepared for GP Management</div>
+    <div style="width:4px;height:4px;border-radius:50%;background:var(--w30);"></div>
+    <div style="font-size:12px;color:var(--w70);">IT Infrastructure Assessment · 2026</div>
+    <div style="width:4px;height:4px;border-radius:50%;background:var(--w30);"></div>
+    <span class="badge b-blue">Confidential</span>
+    <span class="badge b-green">For Approval</span>
+  </div>
+</div>
+</section>
+
+<div class="report-credit">This report was created by Charles.</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('navDots');
+  const progEl = document.getElementById('progBar');
+
+  // Build nav dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.title = `Slide ${i + 1}`;
+    d.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+    dotsEl.appendChild(d);
+  });
+
+  const dots = document.querySelectorAll('.nav-dot');
+  let cur = 0;
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = [...slides].indexOf(e.target);
+        cur = idx;
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        progEl.style.width = (idx / (slides.length - 1) * 100) + '%';
+      }
+    });
+  }, { threshold: 0.5 });
+
+  slides.forEach(s => io.observe(s));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      cur = Math.min(cur + 1, slides.length - 1);
+      slides[cur].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      cur = Math.max(cur - 1, 0);
+      slides[cur].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+</script>
+
+
+<script>
+  // Basic presentation protection: disables right-click, text selection shortcuts, view-source shortcuts and drag copy.
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  document.addEventListener('selectstart', event => event.preventDefault());
+  document.addEventListener('dragstart', event => event.preventDefault());
+  document.addEventListener('keydown', function(e) {
+    const key = e.key.toLowerCase();
+    if (
+      (e.ctrlKey && ['c','u','s','a','p'].includes(key)) ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(key)) ||
+      e.key === 'F12'
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
+
+</body>
+</html>
