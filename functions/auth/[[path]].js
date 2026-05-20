@@ -3,7 +3,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const { report, password } = await request.json();
     console.log("收到报告名称:", report);
-    console.log("环境变量 PASS_brandonaprilreport =", env.PASS_brandonaprilreport ? "存在" : "不存在");
+    console.log("环境变量 PASS_brandonaprilreport =", env.PASS_brandonaprilreport ? "存在" : "不存在！");
     console.log("环境变量 PASS_gpitavrenovationreport =", env.PASS_gpitavrenovationreport ? "存在" : "不存在");
     };
 
