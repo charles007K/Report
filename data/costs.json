@@ -28,6 +28,20 @@
     "note": ""
   },
   {
+    "id": 1782417677433,
+    "date": "2026-05-11",
+    "amount": 431,
+    "desc": "123",
+    "cat": "Office",
+    "vendor": "123",
+    "method": "Bank transfer",
+    "reimb": "No",
+    "recur": "No",
+    "invoice": "No",
+    "invoiceType": "N/A",
+    "note": ""
+  },
+  {
     "id": 1782417646428,
     "date": "2026-03-25",
     "amount": 817,
