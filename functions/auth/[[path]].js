@@ -17,6 +17,7 @@ export async function onRequestPost({ request, env }) {
     const passwords = {
       brandonaprilreport: env.PASS_brandonaprilreport || "123456",
       gpitavrenovationreport: env.PASS_gpitavrenovationreport || "123456",
+      cost_tracker: env.PASS_cost_tracker || "123456",
     };
 
     console.log("收到报告名称:", reportKey);
