@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": 1782417558851,
+    "date": "2026-06-25",
+    "amount": 123,
+    "desc": "221",
+    "cat": "Personnel",
+    "vendor": "OI",
+    "method": "Bank transfer",
+    "reimb": "No",
+    "recur": "No",
+    "invoice": "No",
+    "invoiceType": "N/A",
+    "note": ""
+  }
+]
