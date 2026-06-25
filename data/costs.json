@@ -12,5 +12,19 @@
     "invoice": "No",
     "invoiceType": "N/A",
     "note": ""
+  },
+  {
+    "id": 1782417585194,
+    "date": "2026-06-25",
+    "amount": 213.8,
+    "desc": "IIJJ",
+    "cat": "Travel",
+    "vendor": "IUU",
+    "method": "Bank transfer",
+    "reimb": "No",
+    "recur": "No",
+    "invoice": "No",
+    "invoiceType": "N/A",
+    "note": ""
   }
 ]
