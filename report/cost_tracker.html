@@ -159,15 +159,7 @@ textarea{resize:none}
       <div class="form-row cols-2">
         <div class="form-group">
           <label>Category</label>
-          <select id="inp-cat">
-            <option value="Personnel">Personnel</option>
-            <option value="Office">Office</option>
-            <option value="Travel">Travel</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Professional">Professional services</option>
-            <option value="Communications">Communications</option>
-            <option value="Other">Other</option>
-          </select>
+          <select id="inp-cat"></select>
         </div>
         <div class="form-group"><label>Vendor</label><input type="text" id="inp-vendor"></div>
       </div>
@@ -194,14 +186,15 @@ textarea{resize:none}
       <div class="form-row cols-2">
         <div class="form-group">
           <label>Invoice included</label>
-          <select id="inp-invoice"><option value="No">No</option><option value="Yes">Yes</option></select>
+          <select id="inp-invoice"><option value="No">No</option><option value="Yes" selected>Yes</option></select>
         </div>
         <div class="form-group">
           <label>Invoice type</label>
           <select id="inp-invoice-type">
             <option value="N/A">N/A</option>
-            <option value="Electronic">Electronic (fattura elettronica)</option>
-            <option value="Paper">Paper</option>
+            <option value="Fattura">Fattura</option>
+            <option value="Scontrino">Scontrino</option>
+            <option value="Ricevuta">Ricevuta</option>
           </select>
         </div>
       </div>
@@ -217,6 +210,12 @@ textarea{resize:none}
 <!-- ENTRIES PAGE -->
 <div id="page-list" class="page">
   <div class="filter-row" id="filter-pills"></div>
+  <div class="btn-row" style="justify-content:flex-start;margin-bottom:14px">
+    <button class="btn" onclick="exportCSV()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export to CSV
+    </button>
+  </div>
   <div id="entry-list"></div>
 </div>
 
@@ -265,12 +264,7 @@ textarea{resize:none}
       <div class="form-row cols-2">
         <div class="form-group">
           <label>Category</label>
-          <select id="e-cat">
-            <option value="Personnel">Personnel</option><option value="Office">Office</option>
-            <option value="Travel">Travel</option><option value="Marketing">Marketing</option>
-            <option value="Professional">Professional services</option>
-            <option value="Communications">Communications</option><option value="Other">Other</option>
-          </select>
+          <select id="e-cat"></select>
         </div>
         <div class="form-group"><label>Vendor</label><input type="text" id="e-vendor"></div>
       </div>
@@ -303,8 +297,9 @@ textarea{resize:none}
           <label>Invoice type</label>
           <select id="e-invoice-type">
             <option value="N/A">N/A</option>
-            <option value="Electronic">Electronic (fattura elettronica)</option>
-            <option value="Paper">Paper</option>
+            <option value="Fattura">Fattura</option>
+            <option value="Scontrino">Scontrino</option>
+            <option value="Ricevuta">Ricevuta</option>
           </select>
         </div>
       </div>
@@ -324,12 +319,34 @@ const WORKER_URL = 'https://costtracker.charles007sun.workers.dev/api/data';
 const API_SECRET = '123321QWER';  
 // ─────────────────────────────────────────────────────────────
 
-const CATS = ['Personnel','Office','Travel','Marketing','Professional','Communications','Other'];
+const CATS = [
+  'Business Trip',
+  'Communications',
+  'Marketing',
+  'Office',
+  'Other',
+  'Personnel',
+  'Professional services',
+  'Travel'
+];
 const CAT_COLORS = {
-  Personnel:'#3b82f6',Office:'#22c55e',Travel:'#eab308',
-  Marketing:'#ec4899',Professional:'#8b5cf6',Communications:'#f97316',Other:'#9ca3af'
+  'Business Trip':'#06b6d4',
+  'Communications':'#f97316',
+  'Marketing':'#ec4899',
+  'Office':'#22c55e',
+  'Other':'#9ca3af',
+  'Personnel':'#3b82f6',
+  'Professional services':'#8b5cf6',
+  'Travel':'#eab308'
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function populateCatSelects() {
+  const opts = CATS.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('inp-cat').innerHTML = opts;
+  document.getElementById('e-cat').innerHTML = opts;
+}
+populateCatSelects();
 
 let entries = [];
 let activeFilter = 'All';
@@ -426,11 +443,11 @@ function showPage(name, el) {
 function clearForm() {
   document.getElementById('inp-date').value = today();
   ['inp-amount','inp-desc','inp-vendor','inp-note'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('inp-cat').value = 'Personnel';
+  document.getElementById('inp-cat').value = CATS[0];
   document.getElementById('inp-method').value = 'Bank transfer';
   document.getElementById('inp-reimb').value = 'No';
   document.getElementById('inp-recur').value = 'No';
-  document.getElementById('inp-invoice').value = 'No';
+  document.getElementById('inp-invoice').value = 'Yes';
   document.getElementById('inp-invoice-type').value = 'N/A';
 }
 
@@ -521,6 +538,32 @@ function deleteEntry(id) {
   save(); renderList(); updateStats();
   if (document.getElementById('page-summary').classList.contains('active')) { renderSummary(); closeDrill(); }
   toast('Entry deleted', 'ok');
+}
+
+// ── CSV export ────────────────────────────────────────────────
+function exportCSV() {
+  if (!entries.length) { toast('No entries to export', 'err'); return; }
+  const headers = ['Date','Description','Amount','Category','Vendor','Payment Method','Reimbursable','Recurring','Invoice Included','Invoice Type','Note'];
+  const rows = entries.map(e => [
+    e.date, e.desc, e.amount, e.cat,
+    e.vendor || '', e.method || '', e.reimb || '', e.recur || '',
+    e.invoice || '', e.invoiceType || '', e.note || ''
+  ]);
+  const esc = v => {
+    const s = String(v ?? '');
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const csv = [headers, ...rows].map(r => r.map(esc).join(',')).join('\r\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cost_entries_${today()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('CSV exported \u2713', 'ok');
 }
 
 // ── Edit modal ────────────────────────────────────────────────
