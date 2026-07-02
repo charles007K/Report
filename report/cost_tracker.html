@@ -156,7 +156,11 @@ textarea{resize:none}
         <div class="form-group"><label>Amount (€)</label><input type="number" id="inp-amount" step="0.01" min="0"></div>
       </div>
       <div class="form-group"><label>Description</label><input type="text" id="inp-desc"></div>
-      <div class="form-row cols-2">
+      <div class="form-row cols-3">
+        <div class="form-group">
+          <label>Client</label>
+          <select id="inp-client"></select>
+        </div>
         <div class="form-group">
           <label>Category</label>
           <select id="inp-cat"></select>
@@ -261,7 +265,11 @@ textarea{resize:none}
         <div class="form-group"><label>Amount (€)</label><input type="number" id="e-amount" step="0.01" min="0"></div>
       </div>
       <div class="form-group"><label>Description</label><input type="text" id="e-desc"></div>
-      <div class="form-row cols-2">
+      <div class="form-row cols-3">
+        <div class="form-group">
+          <label>Client</label>
+          <select id="e-client"></select>
+        </div>
         <div class="form-group">
           <label>Category</label>
           <select id="e-cat"></select>
@@ -341,12 +349,20 @@ const CAT_COLORS = {
 };
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
+const CLIENTS = ['GP', 'KeySolution', 'N/A', 'N/A'];
+
 function populateCatSelects() {
   const opts = CATS.map(c => `<option value="${c}">${c}</option>`).join('');
   document.getElementById('inp-cat').innerHTML = opts;
   document.getElementById('e-cat').innerHTML = opts;
 }
+function populateClientSelects() {
+  const opts = CLIENTS.map(c => `<option value="${c}">${c}</option>`).join('');
+  document.getElementById('inp-client').innerHTML = opts;
+  document.getElementById('e-client').innerHTML = opts;
+}
 populateCatSelects();
+populateClientSelects();
 
 let entries = [];
 let activeFilter = 'All';
@@ -444,6 +460,7 @@ function clearForm() {
   document.getElementById('inp-date').value = today();
   ['inp-amount','inp-desc','inp-vendor','inp-note'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('inp-cat').value = CATS[0];
+  document.getElementById('inp-client').value = CLIENTS[0];
   document.getElementById('inp-method').value = 'Bank transfer';
   document.getElementById('inp-reimb').value = 'No';
   document.getElementById('inp-recur').value = 'No';
@@ -460,6 +477,7 @@ function addEntry() {
   if (!desc)            { toast('Description required', 'err'); return; }
   entries.push({
     id: Date.now(), date, amount, desc,
+    client:      document.getElementById('inp-client').value,
     cat:         document.getElementById('inp-cat').value,
     vendor:      document.getElementById('inp-vendor').value.trim(),
     method:      document.getElementById('inp-method').value,
@@ -489,7 +507,7 @@ function entryCardHTML(e) {
     ? `<span class="badge-pill" style="background:#dcfce7;color:#166534">Reimbursable</span>` : '';
   const invBadge  = e.invoice === 'Yes'
     ? `<span class="badge-pill" style="background:#fef9c3;color:#92400e">${e.invoiceType || 'Invoice'}</span>` : '';
-  const meta = [e.cat, e.vendor, e.method].filter(Boolean).join(' \u00b7 ');
+  const meta = [e.client, e.cat, e.vendor, e.method].filter(Boolean).join(' \u00b7 ');
   return `<div class="entry-card">
     <div class="entry-bar" style="background:${CAT_COLORS[e.cat] || '#ccc'}"></div>
     <div class="entry-body">
@@ -543,9 +561,9 @@ function deleteEntry(id) {
 // ── CSV export ────────────────────────────────────────────────
 function exportCSV() {
   if (!entries.length) { toast('No entries to export', 'err'); return; }
-  const headers = ['Date','Description','Amount','Category','Vendor','Payment Method','Reimbursable','Recurring','Invoice Included','Invoice Type','Note'];
+  const headers = ['Date','Description','Amount','Client','Category','Vendor','Payment Method','Reimbursable','Recurring','Invoice Included','Invoice Type','Note'];
   const rows = entries.map(e => [
-    e.date, e.desc, e.amount, e.cat,
+    e.date, e.desc, e.amount, e.client || '', e.cat,
     e.vendor || '', e.method || '', e.reimb || '', e.recur || '',
     e.invoice || '', e.invoiceType || '', e.note || ''
   ]);
@@ -574,6 +592,7 @@ function openEdit(id) {
   document.getElementById('e-date').value         = e.date;
   document.getElementById('e-amount').value       = e.amount;
   document.getElementById('e-desc').value         = e.desc;
+  document.getElementById('e-client').value       = e.client || CLIENTS[0];
   document.getElementById('e-cat').value          = e.cat;
   document.getElementById('e-vendor').value       = e.vendor || '';
   document.getElementById('e-method').value       = e.method || 'Bank transfer';
@@ -598,6 +617,7 @@ function saveEdit() {
   if (!date || !amount || amount <= 0 || !desc) { toast('Date, amount and description required', 'err'); return; }
   entries[idx] = {
     ...entries[idx], date, amount, desc,
+    client:      document.getElementById('e-client').value,
     cat:         document.getElementById('e-cat').value,
     vendor:      document.getElementById('e-vendor').value.trim(),
     method:      document.getElementById('e-method').value,
